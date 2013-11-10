@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TopLogoStyle">
+        <item name="android:src">@drawable/top_logo</item>
+	    <item name="android:layout_width">180dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerHorizontal">false</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_marginLeft">9dp</item>
+         
+        <item name="android:contentDescription">@string/logo</item>
+        <item name="android:layout_centerVertical">true</item>
+    
+    </style>
+</resources>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/LayoutStyle" >
+<include android:id="@+id/topAreaLayout" layout="@layout/scoreboardlayout" />
+
+	<RelativeLayout
+	    android:layout_below="@id/topAreaLayout"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"  
+	 >
+
+    </RelativeLayout>
+    <LinearLayout
+	     android:id="@+id/llButtons"
+        style="@style/GameBoardButtonAreaStyle">
+
+
+	<Button 
+  	    style="@style/GameBoardButtonStyle"
+  	    android:id="@+id/bShuffle"
+        android:layout_width="0dp" 
+        android:layout_weight="1.0"
+        android:text="@string/gameboard_shuffle_button_text"
+    />
+	 
+	<Button 
+  	    style="@style/GameBoardButtonStyle"
+  	    android:id="@+id/bPlay"
+        android:layout_width="0dp" 
+        android:layout_weight="1.0"
+        android:text="@string/gameboard_play_button_text"
+    />
+	 
+  
+    </LinearLayout>
+	<RelativeLayout
+	     android:id="@+id/rlLetters"
+       android:background="@color/tray_background"
+       android:layout_above="@id/llButtons"
+       android:layout_height="wrap_content">
+       	<LinearLayout
+	     android:id="@+id/llLetters1"
+        style="@style/LetterButtonAreaStyle">
+
+
+		<Button  
+	  	    android:id="@+id/bLetter1"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	        android:layout_marginRight="1dp"
+	    />
+		 
+		<Button 
+	  	    android:id="@+id/bLetter2"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	        android:layout_marginRight="1dp"
+	        android:layout_marginLeft="1dp"
+	    />
+	 	<Button  
+	  	    android:id="@+id/bLetter3"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	             android:layout_marginRight="1dp"
+	        android:layout_marginLeft="1dp"
+	    />
+		 
+		<Button 
+	  	    android:id="@+id/bLetter4"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	             android:layout_marginRight="1dp"
+	        android:layout_marginLeft="1dp"
+	    />
+  	<Button  
+	  	    android:id="@+id/bLetter5"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	         android:layout_marginRight="1dp"
+	        android:layout_marginLeft="1dp"
+	    />
+		 
+		<Button 
+	  	    android:id="@+id/bLetter6"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	         
+	        android:layout_marginLeft="1dp"
+	    />
+    </LinearLayout>
+         <LinearLayout
+		     android:id="@+id/llLetters2"
+		     android:layout_below="@id/llLetters1"
+	        style="@style/LetterButtonAreaStyle">
+
+
+		<Button  
+	  	    android:id="@+id/bLetter7"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+		 
+		<Button 
+	  	    android:id="@+id/bLetter8"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+	 	<Button  
+	  	    android:id="@+id/bLetter9"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+		 
+		<Button 
+	  	    android:id="@+id/bLetter10"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+  	<Button  
+	  	    android:id="@+id/bLetter11"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+		 
+		<Button 
+	  	    android:id="@+id/bLetter12"
+	        android:layout_width="0dp" 
+	        android:layout_weight="1.0"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+    </LinearLayout>
+        
+    </RelativeLayout>
+	
+   
+</RelativeLayout>

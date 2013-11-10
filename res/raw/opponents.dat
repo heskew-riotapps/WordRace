@@ -1,0 +1,9 @@
+[
+{ "id": "1", "name": "Dolly", "skillLevel": "1", "imagePrefix": "group_1_skill_level_1", "opponentGroupId": "1" },
+{ "id": "2", "name": "Specs", "skillLevel": "2", "imagePrefix": "group_1_skill_level_2", "opponentGroupId": "1" },
+{ "id": "3", "name": "Slim", "skillLevel": "3", "imagePrefix": "group_1_skill_level_3", "opponentGroupId": "1" },
+{ "id": "4", "name": "Ace", "skillLevel": "4", "imagePrefix": "group_1_skill_level_4", "opponentGroupId": "1" },
+{ "id": "5", "name": "Doc", "skillLevel": "5", "imagePrefix": "group_1_skill_level_5", "opponentGroupId": "1" },
+{ "id": "6", "name": "Pinky", "skillLevel": "6", "imagePrefix": "group_1_skill_level_6", "opponentGroupId": "1" }
+
+]
