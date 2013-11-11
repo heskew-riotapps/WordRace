@@ -85,7 +85,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	 display.getSize(size);
 		int fullWidth = size.x;
 			 
-		int letterTileSize = Math.round(fullWidth / 7.00f);	
+		int letterTileSize = Math.round(fullWidth / 6.20f);	
 	 	int maxTrayTileSize = this.getResources().getInteger(R.integer.maxTrayTileSize);
 		if (letterTileSize > maxTrayTileSize){letterTileSize = maxTrayTileSize;}
 		

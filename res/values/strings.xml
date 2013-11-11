@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">Word Race With Enemies</string>
+    <string name="app_name">Race With Enemies</string>
 	<string name="namespace">com.riotapps.wordrace</string>
 	<string name="wordnik_apiKey">48f31f368d20791114b01067e1d05b68ca177aabdbab4150b</string>
     <string name="chartboost_app_id">5259e7c716ba47022e000001</string>
@@ -143,4 +143,8 @@
 	<string name="game_play_invalid_start_position">The first played word must have at least one letter placed on a star.</string>
 	
 	 <string name="game_last_action_started_context">Have fun and thanks for playing!</string>
+ 
+	 
+	 <string name="scoreboard_words_left">%s words left</string>
+ 	<string name="scoreboard_1_word_left">1 word left</string>
 </resources>

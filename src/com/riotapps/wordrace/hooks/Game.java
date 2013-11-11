@@ -37,6 +37,9 @@ public class Game {
 	
 	@SerializedName("st")
 	private int status;
+	
+	@SerializedName("n_w")
+	private int numPossibleWords;
 
 	public String getId() {
 		return id;
@@ -108,6 +111,14 @@ public class Game {
 	
 	public boolean isActive(){
 		return this.status == 1;
+	}
+
+	public int getNumPossibleWords() {
+		return numPossibleWords;
+	}
+
+	public void setNumPossibleWords(int numPossibleWords) {
+		this.numPossibleWords = numPossibleWords;
 	}
 	
 }
