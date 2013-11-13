@@ -113,6 +113,9 @@ public class Game {
 		return this.status == 1;
 	}
 
+	public boolean isStarted(){
+		return this.status == 5;
+	}
 	public int getNumPossibleWords() {
 		return numPossibleWords;
 	}

@@ -147,4 +147,12 @@
 	 
 	 <string name="scoreboard_words_left">%s words left</string>
  	<string name="scoreboard_1_word_left">1 word left</string>
+ 	<string name="scoreboard_countdown_start">3:00</string>
+ 	<string name="scoreboard_countdown">%1$s:%2$s</string>
+ 	<string name="scoreboard_countdown_completed">0:00</string>
+ 	
+ 	 <string name="game_surface_start_game_confirmation_title">start countdown</string>
+	 <string name="game_surface_start_game_confirmation_text">are you sure?</string>
+	 <string name="main_game_start_prompt_title">create a game</string>
+	 <string name="main_choose">Tap an opponent to create a game</string>
 </resources>
