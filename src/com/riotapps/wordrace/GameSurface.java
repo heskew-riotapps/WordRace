@@ -17,15 +17,20 @@ import com.riotapps.wordbase.interfaces.ICloseDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
 import com.riotapps.wordbase.ui.CustomProgressDialog;
 import com.riotapps.wordbase.ui.DialogManager;
+import com.riotapps.wordbase.ui.GameSurfaceView;
 import com.riotapps.wordbase.ui.MenuUtils;
 import com.riotapps.wordbase.utils.ApplicationContext;
 import com.riotapps.wordbase.utils.Constants;
+import com.riotapps.wordbase.utils.ImageHelper;
 import com.riotapps.wordbase.utils.Logger;
 import com.riotapps.wordbase.utils.PreconditionException;
+import com.riotapps.wordbase.utils.Utils;
 import com.riotapps.wordrace.hooks.Game;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -61,6 +67,202 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	private List<String> possibleWords = new ArrayList<String>();
 	private PreLoadTask preloadTask = null;
 	private CustomProgressDialog spinner;
+	 private static Bitmap trayLetter_A;
+	 private static Bitmap trayLetter_B;
+	 private static Bitmap trayLetter_C;
+	 private static Bitmap trayLetter_D;
+	 private static Bitmap trayLetter_E;
+	 private static Bitmap trayLetter_F;
+	 private static Bitmap trayLetter_G;
+	 private static Bitmap trayLetter_H;
+	 private static Bitmap trayLetter_I;
+	 private static Bitmap trayLetter_J;
+	 private static Bitmap trayLetter_K;
+	 private static Bitmap trayLetter_L;
+	 private static Bitmap trayLetter_M;
+	 private static Bitmap trayLetter_N;
+	 private static Bitmap trayLetter_O;
+	 private static Bitmap trayLetter_P;
+	 private static Bitmap trayLetter_Q;
+	 private static Bitmap trayLetter_R;
+	 private static Bitmap trayLetter_S;
+	 private static Bitmap trayLetter_T;
+	 private static Bitmap trayLetter_U;
+	 private static Bitmap trayLetter_V;
+	 private static Bitmap trayLetter_W;
+	 private static Bitmap trayLetter_X;
+	 private static Bitmap trayLetter_Y;
+	 private static Bitmap trayLetter_Z;
+	 private static Bitmap trayEmpty;
+	 
+	 private static Bitmap getTrayLetter_A(Context context, int tileSize){
+		if (GameSurface.trayLetter_A == null){
+			GameSurface.trayLetter_A = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_a, tileSize, tileSize);
+		}
+		return GameSurface.trayLetter_A;
+	 }
+
+	 private static Bitmap getTrayLetter_B(Context context, int tileSize){
+		if (GameSurface.trayLetter_B == null){
+			GameSurface.trayLetter_B = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_b, tileSize, tileSize);
+		}
+		return GameSurface.trayLetter_B;
+	 }
+
+	 private static Bitmap getTrayLetter_C(Context context, int tileSize){
+		if (GameSurface.trayLetter_C == null){
+			GameSurface.trayLetter_C = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_c, tileSize, tileSize);
+			}
+		return GameSurface.trayLetter_C;
+     }
+	
+	 private static Bitmap getTrayLetter_D(Context context, int tileSize){
+			if (GameSurface.trayLetter_D == null){
+				GameSurface.trayLetter_D = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_d, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_D;
+	 }
+	 private static Bitmap getTrayLetter_E(Context context, int tileSize){
+			if (GameSurface.trayLetter_E == null){
+				GameSurface.trayLetter_E = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_e, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_E;
+	 }
+	 private static Bitmap getTrayLetter_F(Context context, int tileSize){
+			if (GameSurface.trayLetter_F == null){
+				GameSurface.trayLetter_F = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_f, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_F;
+	}
+	 private static Bitmap getTrayLetter_G(Context context, int tileSize){
+			if (GameSurface.trayLetter_G == null){
+				GameSurface.trayLetter_G = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_g, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_G;
+	 }
+	 private static Bitmap getTrayLetter_H(Context context, int tileSize){
+			if (GameSurface.trayLetter_H == null){
+				GameSurface.trayLetter_H = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_h, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_H;
+	 }
+	 private static Bitmap getTrayLetter_I(Context context, int tileSize){
+			if (GameSurface.trayLetter_I == null){
+				GameSurface.trayLetter_I = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_i, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_I;
+	 }
+	 private static Bitmap getTrayLetter_J(Context context, int tileSize){
+			if (GameSurface.trayLetter_J == null){
+				GameSurface.trayLetter_J = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_j, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_J;
+	 }
+	 private static Bitmap getTrayLetter_K(Context context, int tileSize){
+			if (GameSurface.trayLetter_K == null){
+				GameSurface.trayLetter_K = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_k, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_K;
+	}
+	 private static Bitmap getTrayLetter_L(Context context, int tileSize){
+			if (GameSurface.trayLetter_L == null){
+				GameSurface.trayLetter_L = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_l, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_L;
+	 }
+	 private static Bitmap getTrayLetter_M(Context context, int tileSize){
+			if (GameSurface.trayLetter_M == null){
+				GameSurface.trayLetter_M = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_m, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_M;
+	 }
+	 private static Bitmap getTrayLetter_N(Context context, int tileSize){
+
+			if (GameSurface.trayLetter_N == null){
+				GameSurface.trayLetter_N = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_n, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_N;
+	 }
+	 private static Bitmap getTrayLetter_O(Context context, int tileSize){
+			if (GameSurface.trayLetter_O == null){
+				GameSurface.trayLetter_O = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_o, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_O;
+	 }
+	 private static Bitmap getTrayLetter_P(Context context, int tileSize){
+			if (GameSurface.trayLetter_P == null){
+				GameSurface.trayLetter_P = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_p, tileSize, tileSize);
+				//GameSurface.trayLetter_P = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_P)));
+			}
+			return GameSurface.trayLetter_P;
+		}
+	 private static Bitmap getTrayLetter_Q(Context context, int tileSize){
+			if (GameSurface.trayLetter_Q == null){
+				GameSurface.trayLetter_Q = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_q, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_Q;
+	 }
+	 private static Bitmap getTrayLetter_R(Context context, int tileSize){
+			if (GameSurface.trayLetter_R == null){
+				GameSurface.trayLetter_R = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_r, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_R;
+	 }
+	 private static Bitmap getTrayLetter_S(Context context, int tileSize){
+			if (GameSurface.trayLetter_S == null){
+				GameSurface.trayLetter_S = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_s, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_S;
+	 }
+	 private static Bitmap getTrayLetter_T(Context context, int tileSize){
+			if (GameSurface.trayLetter_T == null){
+				GameSurface.trayLetter_T = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_t, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_T;
+	 }
+	 private static Bitmap getTrayLetter_U(Context context, int tileSize){
+			if (GameSurface.trayLetter_U == null){
+				GameSurface.trayLetter_U = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_u, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_U;
+	 }
+	 private static Bitmap getTrayLetter_V(Context context, int tileSize){
+		 	if (GameSurface.trayLetter_V == null){
+				GameSurface.trayLetter_V = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_v, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_V;
+	 }
+	 private static Bitmap getTrayLetter_W(Context context, int tileSize){
+		 	if (GameSurface.trayLetter_W == null){
+				GameSurface.trayLetter_W = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_w, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_W;
+	 }
+	 private static Bitmap getTrayLetter_X(Context context, int tileSize){
+		 	if (GameSurface.trayLetter_X == null){
+				GameSurface.trayLetter_X = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_x, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_X;
+	 }
+	 private static Bitmap getTrayLetter_Y(Context context, int tileSize){
+			if (GameSurface.trayLetter_Y == null){
+				GameSurface.trayLetter_Y = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_y, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_Y;
+		}
+	 private static Bitmap getTrayLetter_Z(Context context, int tileSize){
+			if (GameSurface.trayLetter_Z == null){
+				GameSurface.trayLetter_Z = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_z, tileSize, tileSize);
+			}
+			return GameSurface.trayLetter_Z;
+		}
+	 private static Bitmap getTrayEmpty(Context context, int tileSize){
+			if (GameSurface.trayEmpty == null){
+				GameSurface.trayEmpty = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_tile_empty_bg, tileSize, tileSize);
+			}
+			return GameSurface.trayEmpty;
+		}
+
 	 
 	 
 	 public Tracker getTracker() {
@@ -95,7 +297,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	this.loadVars();
 	 	this.setupMenu();
 	 	this.setupGame();
-	 	this.loadLetterButtons();
+	 	this.loadTray();
 	 	this.loadButtons();
 	}
 	
@@ -135,7 +337,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		}
 	}
 	
-	private void loadLetterButtons(){
+	private void loadTray(){
 		Display display = getWindowManager().getDefaultDisplay();
 	    Point size = new Point();
 	 	display.getSize(size);
@@ -146,65 +348,280 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	int maxTrayTileSize = this.getResources().getInteger(R.integer.maxTrayTileSize);
 		if (letterTileSize > maxTrayTileSize){letterTileSize = maxTrayTileSize;}
 		
-		Button bLetter1 = (Button) findViewById(R.id.bLetter1);
-		Button bLetter2 = (Button) findViewById(R.id.bLetter2);
-		Button bLetter3 = (Button) findViewById(R.id.bLetter3);
-		Button bLetter4 = (Button) findViewById(R.id.bLetter4);
-		Button bLetter5 = (Button) findViewById(R.id.bLetter5);
-		Button bLetter6 = (Button) findViewById(R.id.bLetter6);
-		Button bLetter7 = (Button) findViewById(R.id.bLetter7);
-		Button bLetter8 = (Button) findViewById(R.id.bLetter8);
-		Button bLetter9 = (Button) findViewById(R.id.bLetter9);
-		Button bLetter10 = (Button) findViewById(R.id.bLetter10);
+		ImageView bLetter1 = (ImageView) findViewById(R.id.bLetter1);
+		ImageView bLetter2 = (ImageView) findViewById(R.id.bLetter2);
+		ImageView bLetter3 = (ImageView) findViewById(R.id.bLetter3);
+		ImageView bLetter4 = (ImageView) findViewById(R.id.bLetter4);
+		ImageView bLetter5 = (ImageView) findViewById(R.id.bLetter5);
+		ImageView bLetter6 = (ImageView) findViewById(R.id.bLetter6);
+		ImageView bLetter7 = (ImageView) findViewById(R.id.bLetter7);
+		ImageView bLetter8 = (ImageView) findViewById(R.id.bLetter8);
+		ImageView bLetter9 = (ImageView) findViewById(R.id.bLetter9);
+		ImageView bLetter10 = (ImageView) findViewById(R.id.bLetter10);
  
 		
 		ViewGroup.LayoutParams params1 = bLetter1.getLayoutParams();
 		params1.width = letterTileSize;
 		params1.height = letterTileSize;
 		bLetter1.setLayoutParams(params1);
+		bLetter1.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(0), letterTileSize));
+		
 		ViewGroup.LayoutParams params2 = bLetter2.getLayoutParams();
 		params2.width = letterTileSize;
 		params2.height = letterTileSize;
 		bLetter2.setLayoutParams(params2);
+		bLetter2.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(1), letterTileSize));
+		
 		ViewGroup.LayoutParams params3 = bLetter3.getLayoutParams();
 		params3.width = letterTileSize;
 		params3.height = letterTileSize;
 		bLetter3.setLayoutParams(params3);
+		bLetter3.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(2), letterTileSize));
+		
 		ViewGroup.LayoutParams params4 = bLetter4.getLayoutParams();
 		params4.width = letterTileSize;
 		params4.height = letterTileSize;
 		bLetter4.setLayoutParams(params4);
+		bLetter4.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(3), letterTileSize));
+		
 		ViewGroup.LayoutParams params5 = bLetter5.getLayoutParams();
 		params5.width = letterTileSize;
 		params5.height = letterTileSize;
 		bLetter5.setLayoutParams(params5);
+		bLetter5.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(4), letterTileSize));
+		
 		ViewGroup.LayoutParams params6 = bLetter6.getLayoutParams();
 		params6.width = letterTileSize;
 		params6.height = letterTileSize;
 		bLetter6.setLayoutParams(params6);
+		bLetter6.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(5), letterTileSize));
+		
 		ViewGroup.LayoutParams params7 = bLetter7.getLayoutParams();
 		params7.width = letterTileSize;
 		params7.height = letterTileSize;
 		bLetter7.setLayoutParams(params7);
+		bLetter7.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(6), letterTileSize));
+		
 		ViewGroup.LayoutParams params8 = bLetter8.getLayoutParams();
 		params8.width = letterTileSize;
 		params8.height = letterTileSize;
 		bLetter8.setLayoutParams(params8);
+		bLetter8.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(7), letterTileSize));
+		
 		ViewGroup.LayoutParams params9 = bLetter9.getLayoutParams();
 		params9.width = letterTileSize;
 		params9.height = letterTileSize;
 		bLetter9.setLayoutParams(params9);
+		bLetter9.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(8), letterTileSize));
+		
 		ViewGroup.LayoutParams params10 = bLetter10.getLayoutParams();
 		params10.width = letterTileSize;
 		params10.height = letterTileSize;
 		bLetter10.setLayoutParams(params10);
- 
+		bLetter10.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(9), letterTileSize));
+		
+		bLetter1.setOnClickListener(this);
+		bLetter2.setOnClickListener(this);
+		bLetter3.setOnClickListener(this);
+		bLetter4.setOnClickListener(this);
+		bLetter5.setOnClickListener(this);
+		bLetter6.setOnClickListener(this);
+		bLetter7.setOnClickListener(this);
+		bLetter8.setOnClickListener(this);
+		bLetter9.setOnClickListener(this);
+		bLetter10.setOnClickListener(this);
+		
 	}
 	
-//	private void loadBitmaps(){
-//		private Bitmap bm1;
-//	}
+	private static Bitmap getLetterImage(Context context, String letter, int tileSize){
+		 
+		//resize bitmap before loading
+		if (letter.equals("A")){
+			if (GameSurface.trayLetter_A == null){
+				//GameSurface.trayLetter_A = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_A)));
+				GameSurface.trayLetter_A = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_a, tileSize, tileSize);
+
+			}
+			return GameSurface.trayLetter_A;
+		}
+		else if (letter.equals("B")){
+			if (GameSurface.trayLetter_B == null){
+				GameSurface.trayLetter_B = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_b, tileSize, tileSize);
+				//GameSurface.trayLetter_B = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_B)));
+			}
+			return GameSurface.trayLetter_B;
+		}
+		else if (letter.equals("C")){
+			if (GameSurface.trayLetter_C == null){
+				GameSurface.trayLetter_C = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_c, tileSize, tileSize);
+			//	GameSurface.trayLetter_C = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_C)));
+			}
+			return GameSurface.trayLetter_C;
+		}
+		else if (letter.equals("D")){
+			if (GameSurface.trayLetter_D == null){
+				GameSurface.trayLetter_D = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_d, tileSize, tileSize);
+			//	GameSurface.trayLetter_D = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_D)));
+			}
+			return GameSurface.trayLetter_D;
+		}
+		else if (letter.equals("E")){
+			if (GameSurface.trayLetter_E == null){
+				GameSurface.trayLetter_E = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_e, tileSize, tileSize);
+			//	GameSurface.trayLetter_E = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_E)));
+			}
+			return GameSurface.trayLetter_E;
+		}
+		else if (letter.equals("F")){
+			if (GameSurface.trayLetter_F == null){
+				GameSurface.trayLetter_F = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_f, tileSize, tileSize);
+			//	GameSurface.trayLetter_F = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_F)));
+			}
+			return GameSurface.trayLetter_F;
+		}
+		else if (letter.equals("G")){
+			if (GameSurface.trayLetter_G == null){
+				GameSurface.trayLetter_G = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_g, tileSize, tileSize);
+				//GameSurface.trayLetter_G = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_G)));
+			}
+			return GameSurface.trayLetter_G;
+		}
+		else if (letter.equals("H")){
+			if (GameSurface.trayLetter_H == null){
+				GameSurface.trayLetter_H = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_h, tileSize, tileSize);
+				//GameSurface.trayLetter_H = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_H)));
+			}
+			return GameSurface.trayLetter_H;
+		}
+		else if (letter.equals("I")){
+			if (GameSurface.trayLetter_I == null){
+				GameSurface.trayLetter_I = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_i, tileSize, tileSize);
+			//	GameSurface.trayLetter_I = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_I)));
+			}
+			return GameSurface.trayLetter_I;
+		}
+		else if (letter.equals("J")){
+			if (GameSurface.trayLetter_J == null){
+				GameSurface.trayLetter_J = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_j, tileSize, tileSize);
+				//GameSurface.trayLetter_J = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_J)));
+			}
+			return GameSurface.trayLetter_J;
+		}
+		else if (letter.equals("K")){
+			if (GameSurface.trayLetter_K == null){
+				GameSurface.trayLetter_K = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_k, tileSize, tileSize);
+				//GameSurface.trayLetter_K = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_K)));
+			}
+			return GameSurface.trayLetter_K;
+		}
+		else if (letter.equals("L")){
+			if (GameSurface.trayLetter_L == null){
+				GameSurface.trayLetter_L = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_l, tileSize, tileSize);
+			//	GameSurface.trayLetter_L = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_L)));
+			}
+			return GameSurface.trayLetter_L;
+		}
+		else if (letter.equals("M")){
+			if (GameSurface.trayLetter_M == null){
+				GameSurface.trayLetter_M = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_m, tileSize, tileSize);
+			//	GameSurface.trayLetter_M = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_M)));
+			}
+			return GameSurface.trayLetter_M;
+		}
+		else if (letter.equals("N")){
+			if (GameSurface.trayLetter_N == null){
+				GameSurface.trayLetter_N = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_n, tileSize, tileSize);
+			//	GameSurface.trayLetter_N = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_N)));
+			}
+			return GameSurface.trayLetter_N;
+		}
+		else if (letter.equals("O")){
+			if (GameSurface.trayLetter_O == null){
+				GameSurface.trayLetter_O = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_o, tileSize, tileSize);
+			//	GameSurface.trayLetter_O = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_O)));
+			}
+			return GameSurface.trayLetter_O;
+		}
+		else if (letter.equals("P")){
+			if (GameSurface.trayLetter_P == null){
+				GameSurface.trayLetter_P = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_p, tileSize, tileSize);
+				//GameSurface.trayLetter_P = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_P)));
+			}
+			return GameSurface.trayLetter_P;
+		}
+		else if (letter.equals("Q")){
+			if (GameSurface.trayLetter_Q == null){
+				GameSurface.trayLetter_Q = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_q, tileSize, tileSize);
+			//	GameSurface.trayLetter_Q = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_Q)));
+			}
+			return GameSurface.trayLetter_Q;
+		}
+		else if (letter.equals("R")){
+			if (GameSurface.trayLetter_R == null){
+				GameSurface.trayLetter_R = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_r, tileSize, tileSize);
+			//	GameSurface.trayLetter_R = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_R)));
+			}
+			return GameSurface.trayLetter_R;
+		}
+		else if (letter.equals("S")){
+			if (GameSurface.trayLetter_S == null){
+				GameSurface.trayLetter_S = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_s, tileSize, tileSize);
+				//GameSurface.trayLetter_S = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_S)));
+			}
+			return GameSurface.trayLetter_S;
+		}
+		else if (letter.equals("T")){
+			if (GameSurface.trayLetter_T == null){
+				GameSurface.trayLetter_T = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_t, tileSize, tileSize);
+				//GameSurface.trayLetter_T = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_T)));
+			}
+			return GameSurface.trayLetter_T;
+		}
+		else if (letter.equals("U")){
+			if (GameSurface.trayLetter_U == null){
+				GameSurface.trayLetter_U = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_u, tileSize, tileSize);
+			//	GameSurface.trayLetter_U = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_U)));
+			}
+			return GameSurface.trayLetter_U;
+		}
+		else if (letter.equals("V")){
+			if (GameSurface.trayLetter_V == null){
+				GameSurface.trayLetter_V = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_v, tileSize, tileSize);
+			//	GameSurface.trayLetter_V = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_V)));
+			}
+			return GameSurface.trayLetter_V;
+		}
+		else if (letter.equals("W")){
+			if (GameSurface.trayLetter_W == null){
+				GameSurface.trayLetter_W = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_w, tileSize, tileSize);
+				//GameSurface.trayLetter_W = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_W)));
+			}
+			return GameSurface.trayLetter_W;
+		}
+		else if (letter.equals("X")){
+			if (GameSurface.trayLetter_X == null){
+				GameSurface.trayLetter_X = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_x, tileSize, tileSize);
+			//	GameSurface.trayLetter_X = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_X)));
+			}
+			return GameSurface.trayLetter_X;
+		}
+		else if (letter.equals("Y")){
+			return GameSurface.getTrayLetter_Y(context, tileSize);
+		}
+		else if (letter.equals("Z")){
+			return GameSurface.trayLetter_Z;
+		}
+		else {
+			if (GameSurface.trayEmpty == null){
+				GameSurface.trayEmpty = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_tile_empty_bg, tileSize, tileSize);
+				//GameSurface.trayEmpty = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_empty)));
+			}
+			return GameSurface.trayEmpty;
+		}
+
+ 	}
 	
+ 	
 	private void setupGame(){
 		// Logger.d(TAG,"setupGame game turn=" + this.game.getTurn());
 		spinner = new CustomProgressDialog(this);
@@ -397,9 +814,24 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	public void onClick(View v) {
 	 	if (v.getId() == R.id.bStart) {
 			this.handleStartOnClick();
-		} else if (v.getId() == R.id.bCancel) {
+		} 
+	 	else if (v.getId() == R.id.bCancel) {
 			this.handleCancelOnClick();
-		} 		
+		}
+	 	else if (
+	 			 v.getId() == R.id.bLetter1 || v.getId() == R.id.bLetter2 || v.getId() == R.id.bLetter3 || v.getId() == R.id.bLetter4 || v.getId() == R.id.bLetter5 ||
+	 			 v.getId() == R.id.bLetter6 || v.getId() == R.id.bLetter7 || v.getId() == R.id.bLetter8 || v.getId() == R.id.bLetter9 || v.getId() == R.id.bLetter10
+	 			 ){
+	 		this.handleLetterOnClick(v.getId());
+	 	}
+	}
+	
+	private void handleLetterOnClick(int id){
+		if (id == R.id.bLetter1){
+			
+			R.id.
+		}
+		
 	}
 	
 	 private void setGameId(){

@@ -75,7 +75,54 @@
 	 
   
     </LinearLayout>
-	<LinearLayout
+    <LinearLayout
+	     android:id="@+id/llPlayedWord"
+	     android:orientation="horizontal"
+	     android:layout_width="fill_parent"
+	     android:layout_height="wrap_content"
+        style="@style/GameBoardButtonAreaStyle">
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter1"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter2"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter3"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter4"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter5"
+	        android:layout_marginRight="1dp"	        
+	    />	
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter6"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter7"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter8"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter9"
+	        android:layout_marginRight="1dp"	        
+	    />
+		<ImageView  
+	  	    android:id="@+id/ivPlayedLetter10"
+	        android:layout_marginRight="1dp"	        
+	    />								
+			</LinearLayout>
+	<RelativeLayout
 	     android:id="@+id/rlLetters"
        android:background="@color/tray_background"
        android:layout_above="@id/llButtons"
@@ -90,7 +137,7 @@
 	             style="@style/LetterButtonAreaStyle">
 
 
-		<Button  
+		<ImageView  
 	  	    android:id="@+id/bLetter1"
 	         
 	        android:background="@drawable/tray_tile_empty_bg"
@@ -98,14 +145,14 @@
 	        
 	    />
 		 
-		<Button 
+		<ImageView 
 	  	    android:id="@+id/bLetter2"
 	        
 	        android:background="@drawable/tray_tile_empty_bg"
 	        android:layout_marginRight="1dp"
 	     
 	    />
-	 	<Button  
+	 	<ImageView  
 	  	    android:id="@+id/bLetter3"
 	       
 	        android:background="@drawable/tray_tile_empty_bg"
@@ -113,14 +160,14 @@
 	       
 	    />
 		 
-		<Button 
+		<ImageView 
 	  	    android:id="@+id/bLetter4"
 	     
 	        android:background="@drawable/tray_tile_empty_bg"
 	             android:layout_marginRight="1dp"
 	    
 	    />
-  	<Button  
+  	<ImageView  
 	  	    android:id="@+id/bLetter5"
 	        
 	        android:background="@drawable/tray_tile_empty_bg"
@@ -136,29 +183,29 @@
 		     android:gravity="center_horizontal"
 	        style="@style/LetterButtonAreaStyle">
 
-		<Button 
+		<ImageView 
 	  	    android:id="@+id/bLetter6"
 	        android:background="@drawable/tray_tile_empty_bg"
-	        android:layout_marginLeft="1dp"
+	        android:layout_marginRight="1dp"
 	    />
-		<Button  
+		<ImageView  
 	  	    android:id="@+id/bLetter7"
 	           android:layout_marginRight="1dp"
 	        android:background="@drawable/tray_tile_empty_bg"
 	    />
 		 
-		<Button 
+		<ImageView 
 	  	    android:id="@+id/bLetter8"
 	           android:layout_marginRight="1dp"
 	        android:background="@drawable/tray_tile_empty_bg"
 	    />
-	 	<Button  
+	 	<ImageView  
 	  	    android:id="@+id/bLetter9"
 	           android:layout_marginRight="1dp"
 	        android:background="@drawable/tray_tile_empty_bg"
 	    />
 		 
-		<Button 
+		<ImageView 
 	  	    android:id="@+id/bLetter10"
 	           android:layout_marginRight="1dp"
 	        android:background="@drawable/tray_tile_empty_bg"
@@ -166,7 +213,7 @@
   	 
     </LinearLayout>
         
-    </LinearLayout>
+    </RelativeLayout>
 	
    
 </RelativeLayout>

@@ -155,4 +155,35 @@
 	 <string name="game_surface_start_game_confirmation_text">are you sure?</string>
 	 <string name="main_game_start_prompt_title">create a game</string>
 	 <string name="main_choose">Tap an opponent to create a game</string>
+	 
+	 <string name="tray_letter_file_A">tray_letter_a</string>
+	 <string name="tray_letter_file_B">tray_letter_b</string>
+	 <string name="tray_letter_file_C">tray_letter_c</string>
+	 <string name="tray_letter_file_D">tray_letter_d</string>
+	 <string name="tray_letter_file_E">tray_letter_e</string>
+	 <string name="tray_letter_file_F">tray_letter_f</string>
+	 <string name="tray_letter_file_G">tray_letter_g</string>
+	 <string name="tray_letter_file_H">tray_letter_h</string>
+	 <string name="tray_letter_file_I">tray_letter_i</string>
+	 <string name="tray_letter_file_J">tray_letter_j</string>
+	 <string name="tray_letter_file_K">tray_letter_k</string>
+	 <string name="tray_letter_file_L">tray_letter_l</string>
+	 <string name="tray_letter_file_M">tray_letter_m</string>
+	 <string name="tray_letter_file_N">tray_letter_n</string>
+	 <string name="tray_letter_file_O">tray_letter_o</string>
+	 <string name="tray_letter_file_P">tray_letter_p</string>
+	 <string name="tray_letter_file_Q">tray_letter_q</string>
+	 <string name="tray_letter_file_R">tray_letter_r</string>
+	 <string name="tray_letter_file_S">tray_letter_s</string>
+	 <string name="tray_letter_file_T">tray_letter_t</string>
+	 <string name="tray_letter_file_U">tray_letter_u</string>
+	 <string name="tray_letter_file_V">tray_letter_v</string>
+	 <string name="tray_letter_file_W">tray_letter_w</string>
+	 <string name="tray_letter_file_X">tray_letter_x</string>
+	 <string name="tray_letter_file_Y">tray_letter_y</string>
+	 <string name="tray_letter_file_Z">tray_letter_z</string>	 
+	 <string name="tray_letter_empty">tray_tile_empty_bg</string>	 
+	 	
+	 
+	 
 </resources>
