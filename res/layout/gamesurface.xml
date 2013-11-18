@@ -4,6 +4,7 @@
 <include android:id="@+id/topAreaLayout" layout="@layout/scoreboardlayout" />
 
 	<RelativeLayout
+	    android:id="@+id/rlCountdown"
 	    android:layout_below="@id/topAreaLayout"
 	    android:layout_width="fill_parent"
 	    android:layout_height="50dp" 
@@ -29,7 +30,63 @@
 		    android:layout_marginRight="8dp"
 		    />
     </RelativeLayout>
-    
+       <LinearLayout
+           android:baselineAligned="false"
+         	android:layout_below="@id/rlCountdown"
+           	android:layout_width="fill_parent"
+	     	android:layout_height="200dp"
+	     	android:id="@+id/rlWordLists"
+	     	android:orientation="horizontal"
+	     	android:background="@color/button_area_background"
+	   >
+		<ScrollView   
+	      android:id="@+id/svOpponentWords"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent" 
+    	android:fadingEdge="none"
+   		android:layout_weight="1"
+   
+ 		
+    	 >
+		<LinearLayout
+		    
+		    android:id="@+id/llPlayerWords"
+		   	android:orientation="vertical"
+		   	android:layout_width="fill_parent"
+		   	android:layout_height="wrap_content"
+		    />
+				    
+		</ScrollView>
+		<ScrollView   
+	      	android:id="@+id/svPlayerWords"
+	      	android:layout_width="fill_parent"
+    		android:layout_height="fill_parent" 
+    		android:fadingEdge="none"
+   
+ 		
+    	 >
+		<LinearLayout
+		   	android:id="@+id/llOpponentWords"
+		   	android:orientation="vertical"
+		   	android:layout_width="fill_parent"
+		   	android:layout_height="fill_parent"
+		    />
+				    
+		</ScrollView>		        
+     		<ListView 
+			    android:layout_weight="1"
+       			android:id="@+id/lvPlayer" 
+       			android:layout_height="fill_parent" 
+       			
+        	/>
+     		<ListView 
+    		    android:layout_weight="1"
+       			android:id="@+id/lvOpponent"
+       			android:layout_height="fill_parent" 
+        	/>
+			
+    	</LinearLayout>
+	
 	
     <LinearLayout
 	     android:id="@+id/llButtons"
@@ -75,8 +132,107 @@
 	 
   
     </LinearLayout>
+	<RelativeLayout
+	     android:id="@+id/rlLetters"
+       android:background="@color/tray_background"
+       android:layout_above="@id/llButtons"
+       android:layout_height="wrap_content"
+       android:layout_width="fill_parent"
+       android:paddingTop="2dp"
+       android:paddingBottom="2dp" 
+       android:gravity="center">
+       	<LinearLayout
+	     android:id="@+id/llLetters1"
+	     android:gravity="center_horizontal"
+	             style="@style/LetterButtonAreaStyle">
+
+
+		<ImageView  
+	  	    android:id="@+id/bLetter1"
+	         
+	        android:background="@drawable/tray_tile_empty_bg"
+	        android:layout_marginRight="2dp"
+	        
+	    />
+		 
+		<ImageView 
+	  	    android:id="@+id/bLetter2"
+	        
+	        android:background="@drawable/tray_tile_empty_bg"
+	        android:layout_marginRight="2dp"
+	     
+	    />
+	 	<ImageView  
+	  	    android:id="@+id/bLetter3"
+	       
+	        android:background="@drawable/tray_tile_empty_bg"
+	             android:layout_marginRight="2dp"
+	       
+	    />
+		 
+		<ImageView 
+	  	    android:id="@+id/bLetter4"
+	     
+	        android:background="@drawable/tray_tile_empty_bg"
+	             android:layout_marginRight="2dp"
+	    
+	    />
+  	<ImageView  
+	  	    android:id="@+id/bLetter5"
+	        
+	        android:background="@drawable/tray_tile_empty_bg"
+	         
+	      
+	    />
+		 
+		
+    </LinearLayout>
+         <LinearLayout
+		     android:id="@+id/llLetters2"
+		     android:layout_below="@id/llLetters1"
+		     android:gravity="center_horizontal"
+	        style="@style/LetterButtonAreaStyle"
+	        android:layout_marginTop="2dp">
+
+		<ImageView 
+	  	    android:id="@+id/bLetter6"
+	        android:background="@drawable/tray_tile_empty_bg"
+	        android:layout_marginRight="2dp"
+	    />
+		<ImageView  
+	  	    android:id="@+id/bLetter7"
+	           android:layout_marginRight="2dp"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+		 
+		<ImageView 
+	  	    android:id="@+id/bLetter8"
+	           android:layout_marginRight="2dp"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+	 	<ImageView  
+	  	    android:id="@+id/bLetter9"
+	           android:layout_marginRight="2dp"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+		 
+		<ImageView 
+	  	    android:id="@+id/bLetter10"
+	        android:background="@drawable/tray_tile_empty_bg"
+	    />
+  	 
+    </LinearLayout>
+        
+    </RelativeLayout>
+    <RelativeLayout
+         android:layout_above="@id/rlLetters"
+           android:layout_width="fill_parent"
+	     android:layout_height="wrap_content"
+	     android:id="@+id/rlPlayedWord"
+       
+	   >
     <LinearLayout
-	     android:id="@+id/llPlayedWord"
+         android:id="@+id/llPlayedWord"
 	     android:orientation="horizontal"
 	     android:layout_width="fill_parent"
 	     android:layout_height="wrap_content"
@@ -122,98 +278,6 @@
 	        android:layout_marginRight="1dp"	        
 	    />								
 			</LinearLayout>
-	<RelativeLayout
-	     android:id="@+id/rlLetters"
-       android:background="@color/tray_background"
-       android:layout_above="@id/llButtons"
-       android:layout_height="wrap_content"
-       android:layout_width="fill_parent"
-       android:paddingTop="2dp"
-       android:paddingBottom="2dp" 
-       android:gravity="center">
-       	<LinearLayout
-	     android:id="@+id/llLetters1"
-	     android:gravity="center_horizontal"
-	             style="@style/LetterButtonAreaStyle">
-
-
-		<ImageView  
-	  	    android:id="@+id/bLetter1"
-	         
-	        android:background="@drawable/tray_tile_empty_bg"
-	        android:layout_marginRight="1dp"
-	        
-	    />
-		 
-		<ImageView 
-	  	    android:id="@+id/bLetter2"
-	        
-	        android:background="@drawable/tray_tile_empty_bg"
-	        android:layout_marginRight="1dp"
-	     
-	    />
-	 	<ImageView  
-	  	    android:id="@+id/bLetter3"
-	       
-	        android:background="@drawable/tray_tile_empty_bg"
-	             android:layout_marginRight="1dp"
-	       
-	    />
-		 
-		<ImageView 
-	  	    android:id="@+id/bLetter4"
-	     
-	        android:background="@drawable/tray_tile_empty_bg"
-	             android:layout_marginRight="1dp"
-	    
-	    />
-  	<ImageView  
-	  	    android:id="@+id/bLetter5"
-	        
-	        android:background="@drawable/tray_tile_empty_bg"
-	         
-	      
-	    />
-		 
-		
-    </LinearLayout>
-         <LinearLayout
-		     android:id="@+id/llLetters2"
-		     android:layout_below="@id/llLetters1"
-		     android:gravity="center_horizontal"
-	        style="@style/LetterButtonAreaStyle">
-
-		<ImageView 
-	  	    android:id="@+id/bLetter6"
-	        android:background="@drawable/tray_tile_empty_bg"
-	        android:layout_marginRight="1dp"
-	    />
-		<ImageView  
-	  	    android:id="@+id/bLetter7"
-	           android:layout_marginRight="1dp"
-	        android:background="@drawable/tray_tile_empty_bg"
-	    />
-		 
-		<ImageView 
-	  	    android:id="@+id/bLetter8"
-	           android:layout_marginRight="1dp"
-	        android:background="@drawable/tray_tile_empty_bg"
-	    />
-	 	<ImageView  
-	  	    android:id="@+id/bLetter9"
-	           android:layout_marginRight="1dp"
-	        android:background="@drawable/tray_tile_empty_bg"
-	    />
-		 
-		<ImageView 
-	  	    android:id="@+id/bLetter10"
-	           android:layout_marginRight="1dp"
-	        android:background="@drawable/tray_tile_empty_bg"
-	    />
-  	 
-    </LinearLayout>
-        
-    </RelativeLayout>
-	
-   
+		</RelativeLayout>
+       
 </RelativeLayout>

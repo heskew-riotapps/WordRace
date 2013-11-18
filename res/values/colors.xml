@@ -55,6 +55,9 @@
     <color name="progress_background_color">#cada39</color><!-- 3366dd -->
     <color name="progress_text_color">#000000</color> 
     <color name="progress_background">#137ccd</color>
+    <color name="toast_background_color">#ae1d18</color>
+    <color name="toast_inner_background_color">#ae1d18</color>
+    <color name="toast_text_color">#ffffff</color>
     <color name="dialog_background_color">#137ccd</color>
         
     <color name="button_text_color">#fff5ee</color>

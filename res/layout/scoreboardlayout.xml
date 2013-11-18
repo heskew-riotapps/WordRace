@@ -48,7 +48,12 @@
 				style="@style/ScoreboardLettersLeftStyle"
 	          
 	         />
-	      
+	      	 <TextView
+	            android:id="@+id/tvNumPoints"
+				style="@style/ScoreboardNumPointsStyle"
+				 android:layout_below="@id/tvWordsLeft"  
+ 
+	         />
 	    </RelativeLayout>
 </RelativeLayout>
    <View 

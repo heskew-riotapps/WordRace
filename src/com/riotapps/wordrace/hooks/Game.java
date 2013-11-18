@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
+import com.riotapps.wordbase.hooks.Opponent;
+import com.riotapps.wordbase.hooks.OpponentService;
 import com.riotapps.wordbase.hooks.PlayedTile;
 import com.riotapps.wordbase.hooks.PlayedTurn;
 import com.riotapps.wordbase.hooks.PlayedWord;
@@ -41,6 +43,9 @@ public class Game {
 	@SerializedName("n_w")
 	private int numPossibleWords;
 
+	public Opponent getOpponent(){
+		return OpponentService.getOpponent(this.opponentId);
+	}
 	public String getId() {
 		return id;
 	}

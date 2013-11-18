@@ -184,6 +184,8 @@
 	 <string name="tray_letter_file_Z">tray_letter_z</string>	 
 	 <string name="tray_letter_empty">tray_tile_empty_bg</string>	 
 	 	
-	 
-	 
+	 <string name="game_surface_race_word_too_short">words must be at least 3 letters long</string>
+	 <string name="game_surface_race_word_opponent_played">%1$s has already played %2$s</string>	
+	 <string name="game_surface_race_word_already_played">you have already played %1$s</string> 
+	 <string name="game_surface_race_word_invalid">%s is not a valid word</string>
 </resources>

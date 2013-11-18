@@ -2,4 +2,5 @@
 <resources>
  	<integer name="gameBoardLogoHeightPercentageInTenths">9</integer>
  	<integer name="maxGameBoardLogoHeight">80</integer>
+ 	<integer name="minWordLength">3</integer>
 </resources>

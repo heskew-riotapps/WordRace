@@ -1,7 +1,11 @@
 package com.riotapps.wordrace;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.chartboost.sdk.Chartboost;
 import com.chartboost.sdk.ChartboostDelegate;
@@ -9,6 +13,10 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
 import com.riotapps.wordrace.R;
 import com.riotapps.wordrace.hooks.GameService;
+import com.riotapps.wordbase.GameHistory;
+import com.riotapps.wordbase.hooks.AlphabetService;
+import com.riotapps.wordbase.hooks.Opponent;
+import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.Player;
 import com.riotapps.wordbase.hooks.PlayerService;
 import com.riotapps.wordbase.hooks.StoreService;
@@ -16,6 +24,7 @@ import com.riotapps.wordbase.hooks.WordService;
 import com.riotapps.wordbase.interfaces.ICloseDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
 import com.riotapps.wordbase.ui.CustomProgressDialog;
+import com.riotapps.wordbase.ui.CustomToast;
 import com.riotapps.wordbase.ui.DialogManager;
 import com.riotapps.wordbase.ui.GameSurfaceView;
 import com.riotapps.wordbase.ui.MenuUtils;
@@ -27,23 +36,29 @@ import com.riotapps.wordbase.utils.PreconditionException;
 import com.riotapps.wordbase.utils.Utils;
 import com.riotapps.wordrace.hooks.Game;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -63,9 +78,29 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private Chartboost cb;
 	 private CountDownTimer countdown = null;
 	 private TextView tvCountdown;
+	 private TextView tvNumPoints;
+	 private TextView tvWordsLeft;
+	 private TextView tvOpponentScore;
+	 private TextView tvPlayerScore;
+	 private ListView lvOpponent;
+	 private ListView lvPlayer;
+	 private LinearLayout llPlayerWords;
+	 private PlayedWordAdapter playerListadapter;
+ 
+	private	LayoutInflater inflater;
+
 	 private CustomButtonDialog customDialog = null; 
 	private List<String> possibleWords = new ArrayList<String>();
 	private PreLoadTask preloadTask = null;
+	private int letterTileSize;
+	private int playedLetterTileSize;
+	
+	private SortedSet<String> wordsPlayedByOpponent = new TreeSet<String>();
+	private SortedSet<String> wordsPlayedByPlayer = new TreeSet<String>();
+	
+	private List<PlayedWord> wordListPlayedByOpponent = new ArrayList<PlayedWord>();
+	private List<PlayedWord> wordListPlayedByPlayer = new ArrayList<PlayedWord>();
+	
 	private CustomProgressDialog spinner;
 	 private static Bitmap trayLetter_A;
 	 private static Bitmap trayLetter_B;
@@ -93,7 +128,63 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private static Bitmap trayLetter_X;
 	 private static Bitmap trayLetter_Y;
 	 private static Bitmap trayLetter_Z;
+	 private static Bitmap playedLetter_A;
+	 private static Bitmap playedLetter_B;
+	 private static Bitmap playedLetter_C;
+	 private static Bitmap playedLetter_D;
+	 private static Bitmap playedLetter_E;
+	 private static Bitmap playedLetter_F;
+	 private static Bitmap playedLetter_G;
+	 private static Bitmap playedLetter_H;
+	 private static Bitmap playedLetter_I;
+	 private static Bitmap playedLetter_J;
+	 private static Bitmap playedLetter_K;
+	 private static Bitmap playedLetter_L;
+	 private static Bitmap playedLetter_M;
+	 private static Bitmap playedLetter_N;
+	 private static Bitmap playedLetter_O;
+	 private static Bitmap playedLetter_P;
+	 private static Bitmap playedLetter_Q;
+	 private static Bitmap playedLetter_R;
+	 private static Bitmap playedLetter_S;
+	 private static Bitmap playedLetter_T;
+	 private static Bitmap playedLetter_U;
+	 private static Bitmap playedLetter_V;
+	 private static Bitmap playedLetter_W;
+	 private static Bitmap playedLetter_X;
+	 private static Bitmap playedLetter_Y;
+	 private static Bitmap playedLetter_Z;
 	 private static Bitmap trayEmpty;
+	 private static Bitmap playedEmpty;
+	 private static Bitmap playedEmpty_6;
+	 private static Bitmap playedEmpty_8;
+	 private static Bitmap playedEmpty_10;
+	 
+	 private ImageView ivPlayedLetter1;
+	 private ImageView ivPlayedLetter2;
+	 private ImageView ivPlayedLetter3;
+	 private ImageView ivPlayedLetter4;
+	 private ImageView ivPlayedLetter5;
+	 private ImageView ivPlayedLetter6;
+	 private ImageView ivPlayedLetter7;
+	 private ImageView ivPlayedLetter8;
+	 private ImageView ivPlayedLetter9;
+	 private ImageView ivPlayedLetter10;
+
+	 private ImageView bLetter1;
+	 private ImageView bLetter2;
+	 private ImageView bLetter3;
+	 private ImageView bLetter4;
+	 private ImageView bLetter5;
+	 private ImageView bLetter6;
+	 private ImageView bLetter7;
+	 private ImageView bLetter8;
+	 private ImageView bLetter9;
+	 private ImageView bLetter10;	
+
+	 private List<String> hopper = new ArrayList<String>();
+	 private List<String> hopperState = new ArrayList<String>();
+	 private List<String> currentWord = new ArrayList<String>();
 	 
 	 private static Bitmap getTrayLetter_A(Context context, int tileSize){
 		if (GameSurface.trayLetter_A == null){
@@ -262,7 +353,194 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			}
 			return GameSurface.trayEmpty;
 		}
+	 
+	 
+	 private static Bitmap getPlayedLetter_A(Context context, int tileSize){
+			if (GameSurface.playedLetter_A == null){
+				GameSurface.playedLetter_A = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_a, tileSize, tileSize);
+			}
+			return GameSurface.playedLetter_A;
+		 }
 
+		 private static Bitmap getPlayedLetter_B(Context context, int tileSize){
+			if (GameSurface.playedLetter_B == null){
+				GameSurface.playedLetter_B = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_b, tileSize, tileSize);
+			}
+			return GameSurface.playedLetter_B;
+		 }
+
+		 private static Bitmap getPlayedLetter_C(Context context, int tileSize){
+			if (GameSurface.playedLetter_C == null){
+				GameSurface.playedLetter_C = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_c, tileSize, tileSize);
+				}
+			return GameSurface.playedLetter_C;
+	     }
+		
+		 private static Bitmap getPlayedLetter_D(Context context, int tileSize){
+				if (GameSurface.playedLetter_D == null){
+					GameSurface.playedLetter_D = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_d, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_D;
+		 }
+		 private static Bitmap getPlayedLetter_E(Context context, int tileSize){
+				if (GameSurface.playedLetter_E == null){
+					GameSurface.playedLetter_E = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_e, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_E;
+		 }
+		 private static Bitmap getPlayedLetter_F(Context context, int tileSize){
+				if (GameSurface.playedLetter_F == null){
+					GameSurface.playedLetter_F = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_f, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_F;
+		}
+		 private static Bitmap getPlayedLetter_G(Context context, int tileSize){
+				if (GameSurface.playedLetter_G == null){
+					GameSurface.playedLetter_G = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_g, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_G;
+		 }
+		 private static Bitmap getPlayedLetter_H(Context context, int tileSize){
+				if (GameSurface.playedLetter_H == null){
+					GameSurface.playedLetter_H = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_h, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_H;
+		 }
+		 private static Bitmap getPlayedLetter_I(Context context, int tileSize){
+				if (GameSurface.playedLetter_I == null){
+					GameSurface.playedLetter_I = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_i, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_I;
+		 }
+		 private static Bitmap getPlayedLetter_J(Context context, int tileSize){
+				if (GameSurface.playedLetter_J == null){
+					GameSurface.playedLetter_J = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_j, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_J;
+		 }
+		 private static Bitmap getPlayedLetter_K(Context context, int tileSize){
+				if (GameSurface.playedLetter_K == null){
+					GameSurface.playedLetter_K = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_k, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_K;
+		}
+		 private static Bitmap getPlayedLetter_L(Context context, int tileSize){
+				if (GameSurface.playedLetter_L == null){
+					GameSurface.playedLetter_L = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_l, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_L;
+		 }
+		 private static Bitmap getPlayedLetter_M(Context context, int tileSize){
+				if (GameSurface.playedLetter_M == null){
+					GameSurface.playedLetter_M = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_m, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_M;
+		 }
+		 private static Bitmap getPlayedLetter_N(Context context, int tileSize){
+
+				if (GameSurface.playedLetter_N == null){
+					GameSurface.playedLetter_N = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_n, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_N;
+		 }
+		 private static Bitmap getPlayedLetter_O(Context context, int tileSize){
+				if (GameSurface.playedLetter_O == null){
+					GameSurface.playedLetter_O = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_o, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_O;
+		 }
+		 private static Bitmap getPlayedLetter_P(Context context, int tileSize){
+				if (GameSurface.playedLetter_P == null){
+					GameSurface.playedLetter_P = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_p, tileSize, tileSize);
+					//GameSurface.playedLetter_P = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.played_letter_file_P)));
+				}
+				return GameSurface.playedLetter_P;
+			}
+		 private static Bitmap getPlayedLetter_Q(Context context, int tileSize){
+				if (GameSurface.playedLetter_Q == null){
+					GameSurface.playedLetter_Q = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_q, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_Q;
+		 }
+		 private static Bitmap getPlayedLetter_R(Context context, int tileSize){
+				if (GameSurface.playedLetter_R == null){
+					GameSurface.playedLetter_R = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_r, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_R;
+		 }
+		 private static Bitmap getPlayedLetter_S(Context context, int tileSize){
+				if (GameSurface.playedLetter_S == null){
+					GameSurface.playedLetter_S = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_s, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_S;
+		 }
+		 private static Bitmap getPlayedLetter_T(Context context, int tileSize){
+				if (GameSurface.playedLetter_T == null){
+					GameSurface.playedLetter_T = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_t, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_T;
+		 }
+		 private static Bitmap getPlayedLetter_U(Context context, int tileSize){
+				if (GameSurface.playedLetter_U == null){
+					GameSurface.playedLetter_U = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_u, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_U;
+		 }
+		 private static Bitmap getPlayedLetter_V(Context context, int tileSize){
+			 	if (GameSurface.playedLetter_V == null){
+					GameSurface.playedLetter_V = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_v, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_V;
+		 }
+		 private static Bitmap getPlayedLetter_W(Context context, int tileSize){
+			 	if (GameSurface.playedLetter_W == null){
+					GameSurface.playedLetter_W = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_w, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_W;
+		 }
+		 private static Bitmap getPlayedLetter_X(Context context, int tileSize){
+			 	if (GameSurface.playedLetter_X == null){
+					GameSurface.playedLetter_X = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_x, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_X;
+		 }
+		 private static Bitmap getPlayedLetter_Y(Context context, int tileSize){
+				if (GameSurface.playedLetter_Y == null){
+					GameSurface.playedLetter_Y = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_y, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_Y;
+			}
+		 private static Bitmap getPlayedLetter_Z(Context context, int tileSize){
+				if (GameSurface.playedLetter_Z == null){
+					GameSurface.playedLetter_Z = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_letter_z, tileSize, tileSize);
+				}
+				return GameSurface.playedLetter_Z;
+		 }
+	 private static Bitmap getPlayedEmpty(Context context, int tileSize){
+			if (GameSurface.playedEmpty == null){
+				GameSurface.playedEmpty = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_tile_empty_bg, tileSize, tileSize);
+			}
+			return GameSurface.playedEmpty;
+		}
+
+	 private static Bitmap getPlayedEmpty_6(Context context, int tileSize){
+			if (GameSurface.playedEmpty_6 == null){
+				GameSurface.playedEmpty_6 = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_tile_empty_6_bg, tileSize, tileSize);
+			}
+			return GameSurface.playedEmpty_6;
+		}
+	 private static Bitmap getPlayedEmpty_8(Context context, int tileSize){
+			if (GameSurface.playedEmpty_8 == null){
+				GameSurface.playedEmpty_8 = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_tile_empty_8_bg, tileSize, tileSize);
+			}
+			return GameSurface.playedEmpty_8;
+		}
+	 private static Bitmap getPlayedEmpty_10(Context context, int tileSize){
+			if (GameSurface.playedEmpty_10 == null){
+				GameSurface.playedEmpty_10 = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_tile_empty_10_bg, tileSize, tileSize);
+			}
+			return GameSurface.playedEmpty_10;
+		}
 	 
 	 
 	 public Tracker getTracker() {
@@ -291,19 +569,16 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		setContentView(R.layout.gamesurface);
 		
 		this.setGameId();
-	 	
 	 	this.game = GameService.getGame(gameId); //(Game) i.getParcelableExtra(Constants.EXTRA_GAME);
 		
-	 	this.loadVars();
+	 	this.loadViews();
 	 	this.setupMenu();
 	 	this.setupGame();
-	 	this.loadTray();
+	 	this.loadLetterViews();
 	 	this.loadButtons();
+	 	this.initializePlayerWordLists();
 	}
-	
-	private void loadVars(){
-		this.tvCountdown = (TextView)this.findViewById(R.id.tvCountdown);
-	}
+	 
 
 	private void loadButtons(){
 		Button bStart = (Button)this.findViewById(R.id.bStart);
@@ -337,88 +612,105 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		}
 	}
 	
-	private void loadTray(){
+	private void loadViews(){
+		this.inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		this.tvCountdown = (TextView)this.findViewById(R.id.tvCountdown);
+		this.tvNumPoints = (TextView)this.findViewById(R.id.tvNumPoints);
+		this.tvWordsLeft = (TextView)this.findViewById(R.id.tvWordsLeft);
+		this.tvOpponentScore = (TextView)this.findViewById(R.id.tvOpponentScore);
+		this.tvPlayerScore = (TextView)this.findViewById(R.id.tvPlayerScore);
+		this.lvOpponent = (ListView)this.findViewById(R.id.lvOpponent);
+		this.lvPlayer = (ListView)this.findViewById(R.id.lvPlayer);
+		this.llPlayerWords = (LinearLayout)this.findViewById(R.id.llPlayerWords);
+		
+		this.bLetter1 = (ImageView) findViewById(R.id.bLetter1);
+		this.bLetter2 = (ImageView) findViewById(R.id.bLetter2);
+		this.bLetter3 = (ImageView) findViewById(R.id.bLetter3);
+		this.bLetter4 = (ImageView) findViewById(R.id.bLetter4);
+		this.bLetter5 = (ImageView) findViewById(R.id.bLetter5);
+		this.bLetter6 = (ImageView) findViewById(R.id.bLetter6);
+		this.bLetter7 = (ImageView) findViewById(R.id.bLetter7);
+		this.bLetter8 = (ImageView) findViewById(R.id.bLetter8);
+		this.bLetter9 = (ImageView) findViewById(R.id.bLetter9);
+		this.bLetter10 = (ImageView) findViewById(R.id.bLetter10);
+
+		this.ivPlayedLetter1 = (ImageView) findViewById(R.id.ivPlayedLetter1);
+		this.ivPlayedLetter2 = (ImageView) findViewById(R.id.ivPlayedLetter2);
+		this.ivPlayedLetter3 = (ImageView) findViewById(R.id.ivPlayedLetter3);
+		this.ivPlayedLetter4 = (ImageView) findViewById(R.id.ivPlayedLetter4);
+		this.ivPlayedLetter5 = (ImageView) findViewById(R.id.ivPlayedLetter5);
+		this.ivPlayedLetter6 = (ImageView) findViewById(R.id.ivPlayedLetter6);
+		this.ivPlayedLetter7 = (ImageView) findViewById(R.id.ivPlayedLetter7);
+		this.ivPlayedLetter8 = (ImageView) findViewById(R.id.ivPlayedLetter8);
+		this.ivPlayedLetter9 = (ImageView) findViewById(R.id.ivPlayedLetter9);
+		this.ivPlayedLetter10 = (ImageView) findViewById(R.id.ivPlayedLetter10);
+
+	}
+	
+	private void loadLetterViews(){
 		Display display = getWindowManager().getDefaultDisplay();
 	    Point size = new Point();
 	 	display.getSize(size);
 	 	 display.getSize(size);
 		int fullWidth = size.x;
-			 
-		int letterTileSize = Math.round(fullWidth / 6.20f);	
+
+		this.playedLetterTileSize = Math.round(fullWidth / 11.00f);
+		this.letterTileSize = Math.round(fullWidth / 5.80f);	
 	 	int maxTrayTileSize = this.getResources().getInteger(R.integer.maxTrayTileSize);
-		if (letterTileSize > maxTrayTileSize){letterTileSize = maxTrayTileSize;}
-		
-		ImageView bLetter1 = (ImageView) findViewById(R.id.bLetter1);
-		ImageView bLetter2 = (ImageView) findViewById(R.id.bLetter2);
-		ImageView bLetter3 = (ImageView) findViewById(R.id.bLetter3);
-		ImageView bLetter4 = (ImageView) findViewById(R.id.bLetter4);
-		ImageView bLetter5 = (ImageView) findViewById(R.id.bLetter5);
-		ImageView bLetter6 = (ImageView) findViewById(R.id.bLetter6);
-		ImageView bLetter7 = (ImageView) findViewById(R.id.bLetter7);
-		ImageView bLetter8 = (ImageView) findViewById(R.id.bLetter8);
-		ImageView bLetter9 = (ImageView) findViewById(R.id.bLetter9);
-		ImageView bLetter10 = (ImageView) findViewById(R.id.bLetter10);
- 
+		if (letterTileSize > maxTrayTileSize){letterTileSize = maxTrayTileSize;} 
 		
 		ViewGroup.LayoutParams params1 = bLetter1.getLayoutParams();
 		params1.width = letterTileSize;
 		params1.height = letterTileSize;
 		bLetter1.setLayoutParams(params1);
-		bLetter1.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(0), letterTileSize));
 		
 		ViewGroup.LayoutParams params2 = bLetter2.getLayoutParams();
 		params2.width = letterTileSize;
 		params2.height = letterTileSize;
 		bLetter2.setLayoutParams(params2);
-		bLetter2.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(1), letterTileSize));
 		
 		ViewGroup.LayoutParams params3 = bLetter3.getLayoutParams();
 		params3.width = letterTileSize;
 		params3.height = letterTileSize;
 		bLetter3.setLayoutParams(params3);
-		bLetter3.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(2), letterTileSize));
 		
 		ViewGroup.LayoutParams params4 = bLetter4.getLayoutParams();
 		params4.width = letterTileSize;
 		params4.height = letterTileSize;
 		bLetter4.setLayoutParams(params4);
-		bLetter4.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(3), letterTileSize));
 		
 		ViewGroup.LayoutParams params5 = bLetter5.getLayoutParams();
 		params5.width = letterTileSize;
 		params5.height = letterTileSize;
 		bLetter5.setLayoutParams(params5);
-		bLetter5.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(4), letterTileSize));
 		
 		ViewGroup.LayoutParams params6 = bLetter6.getLayoutParams();
 		params6.width = letterTileSize;
 		params6.height = letterTileSize;
 		bLetter6.setLayoutParams(params6);
-		bLetter6.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(5), letterTileSize));
 		
 		ViewGroup.LayoutParams params7 = bLetter7.getLayoutParams();
 		params7.width = letterTileSize;
 		params7.height = letterTileSize;
 		bLetter7.setLayoutParams(params7);
-		bLetter7.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(6), letterTileSize));
 		
 		ViewGroup.LayoutParams params8 = bLetter8.getLayoutParams();
 		params8.width = letterTileSize;
 		params8.height = letterTileSize;
 		bLetter8.setLayoutParams(params8);
-		bLetter8.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(7), letterTileSize));
 		
 		ViewGroup.LayoutParams params9 = bLetter9.getLayoutParams();
 		params9.width = letterTileSize;
 		params9.height = letterTileSize;
 		bLetter9.setLayoutParams(params9);
-		bLetter9.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(8), letterTileSize));
 		
 		ViewGroup.LayoutParams params10 = bLetter10.getLayoutParams();
 		params10.width = letterTileSize;
 		params10.height = letterTileSize;
 		bLetter10.setLayoutParams(params10);
-		bLetter10.setImageBitmap(GameSurface.getLetterImage(this, this.game.getHopper().get(9), letterTileSize));
+		
+		this.initializeTray();
 		
 		bLetter1.setOnClickListener(this);
 		bLetter2.setOnClickListener(this);
@@ -431,197 +723,255 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		bLetter9.setOnClickListener(this);
 		bLetter10.setOnClickListener(this);
 		
+		ViewGroup.LayoutParams params_p1 = ivPlayedLetter1.getLayoutParams();
+		params_p1.width = playedLetterTileSize;
+		params_p1.height = playedLetterTileSize;
+		ivPlayedLetter1.setLayoutParams(params_p1);
+		
+		ViewGroup.LayoutParams params_p2 = ivPlayedLetter2.getLayoutParams();
+		params_p2.width = playedLetterTileSize;
+		params_p2.height = playedLetterTileSize;
+		ivPlayedLetter2.setLayoutParams(params_p2);
+		
+		ViewGroup.LayoutParams params_p3 = ivPlayedLetter3.getLayoutParams();
+		params_p3.width = playedLetterTileSize;
+		params_p3.height = playedLetterTileSize;
+		ivPlayedLetter3.setLayoutParams(params_p3);
+
+		ViewGroup.LayoutParams params_p4 = ivPlayedLetter4.getLayoutParams();
+		params_p4.width = playedLetterTileSize;
+		params_p4.height = playedLetterTileSize;
+		ivPlayedLetter4.setLayoutParams(params_p4);
+		
+		ViewGroup.LayoutParams params_p5 = ivPlayedLetter5.getLayoutParams();
+		params_p5.width = playedLetterTileSize;
+		params_p5.height = playedLetterTileSize;
+		ivPlayedLetter5.setLayoutParams(params_p5);
+
+		ViewGroup.LayoutParams params_p6 = ivPlayedLetter6.getLayoutParams();
+		params_p6.width = playedLetterTileSize;
+		params_p6.height = playedLetterTileSize;
+		ivPlayedLetter6.setLayoutParams(params_p6);
+
+		ViewGroup.LayoutParams params_p7 = ivPlayedLetter7.getLayoutParams();
+		params_p7.width = playedLetterTileSize;
+		params_p7.height = playedLetterTileSize;
+		ivPlayedLetter7.setLayoutParams(params_p7);
+
+		ViewGroup.LayoutParams params_p8 = ivPlayedLetter8.getLayoutParams();
+		params_p8.width = playedLetterTileSize;
+		params_p8.height = playedLetterTileSize;
+		ivPlayedLetter8.setLayoutParams(params_p8);
+
+		ViewGroup.LayoutParams params_p9 = ivPlayedLetter9.getLayoutParams();
+		params_p9.width = playedLetterTileSize;
+		params_p9.height = playedLetterTileSize;
+		ivPlayedLetter9.setLayoutParams(params_p9);
+
+		ViewGroup.LayoutParams params_p10 = ivPlayedLetter10.getLayoutParams();
+		params_p10.width = playedLetterTileSize;
+		params_p10.height = playedLetterTileSize;
+		ivPlayedLetter10.setLayoutParams(params_p10);
+
+		ivPlayedLetter1.setOnClickListener(this);
+		ivPlayedLetter2.setOnClickListener(this);
+		ivPlayedLetter3.setOnClickListener(this);
+		ivPlayedLetter4.setOnClickListener(this);
+		ivPlayedLetter5.setOnClickListener(this);
+		ivPlayedLetter6.setOnClickListener(this);
+		ivPlayedLetter7.setOnClickListener(this);
+		ivPlayedLetter8.setOnClickListener(this);
+		ivPlayedLetter9.setOnClickListener(this);
+		ivPlayedLetter10.setOnClickListener(this);
+		
+		this.initializePlayedTiles();
 	}
 	
-	private static Bitmap getLetterImage(Context context, String letter, int tileSize){
+	
+	private static Bitmap getTrayLetterImage(Context context, String letter, int tileSize){
 		 
 		//resize bitmap before loading
 		if (letter.equals("A")){
-			if (GameSurface.trayLetter_A == null){
-				//GameSurface.trayLetter_A = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_A)));
-				GameSurface.trayLetter_A = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_a, tileSize, tileSize);
-
-			}
-			return GameSurface.trayLetter_A;
+			return GameSurface.getTrayLetter_A(context, tileSize);
 		}
 		else if (letter.equals("B")){
-			if (GameSurface.trayLetter_B == null){
-				GameSurface.trayLetter_B = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_b, tileSize, tileSize);
-				//GameSurface.trayLetter_B = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_B)));
-			}
-			return GameSurface.trayLetter_B;
+			return GameSurface.getTrayLetter_B(context, tileSize);
 		}
 		else if (letter.equals("C")){
-			if (GameSurface.trayLetter_C == null){
-				GameSurface.trayLetter_C = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_c, tileSize, tileSize);
-			//	GameSurface.trayLetter_C = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_C)));
-			}
-			return GameSurface.trayLetter_C;
+			return GameSurface.getTrayLetter_C(context, tileSize);
 		}
 		else if (letter.equals("D")){
-			if (GameSurface.trayLetter_D == null){
-				GameSurface.trayLetter_D = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_d, tileSize, tileSize);
-			//	GameSurface.trayLetter_D = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_D)));
-			}
-			return GameSurface.trayLetter_D;
+			return GameSurface.getTrayLetter_D(context, tileSize);
 		}
 		else if (letter.equals("E")){
-			if (GameSurface.trayLetter_E == null){
-				GameSurface.trayLetter_E = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_e, tileSize, tileSize);
-			//	GameSurface.trayLetter_E = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_E)));
-			}
-			return GameSurface.trayLetter_E;
+			return GameSurface.getTrayLetter_E(context, tileSize);
 		}
 		else if (letter.equals("F")){
-			if (GameSurface.trayLetter_F == null){
-				GameSurface.trayLetter_F = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_f, tileSize, tileSize);
-			//	GameSurface.trayLetter_F = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_F)));
-			}
-			return GameSurface.trayLetter_F;
+			return GameSurface.getTrayLetter_F(context, tileSize);
 		}
 		else if (letter.equals("G")){
-			if (GameSurface.trayLetter_G == null){
-				GameSurface.trayLetter_G = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_g, tileSize, tileSize);
-				//GameSurface.trayLetter_G = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_G)));
-			}
-			return GameSurface.trayLetter_G;
+			return GameSurface.getTrayLetter_G(context, tileSize);
 		}
 		else if (letter.equals("H")){
-			if (GameSurface.trayLetter_H == null){
-				GameSurface.trayLetter_H = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_h, tileSize, tileSize);
-				//GameSurface.trayLetter_H = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_H)));
-			}
-			return GameSurface.trayLetter_H;
+			return GameSurface.getTrayLetter_H(context, tileSize);
 		}
 		else if (letter.equals("I")){
-			if (GameSurface.trayLetter_I == null){
-				GameSurface.trayLetter_I = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_i, tileSize, tileSize);
-			//	GameSurface.trayLetter_I = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_I)));
-			}
-			return GameSurface.trayLetter_I;
+			return GameSurface.getTrayLetter_I(context, tileSize);
 		}
 		else if (letter.equals("J")){
-			if (GameSurface.trayLetter_J == null){
-				GameSurface.trayLetter_J = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_j, tileSize, tileSize);
-				//GameSurface.trayLetter_J = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_J)));
-			}
-			return GameSurface.trayLetter_J;
+			return GameSurface.getTrayLetter_J(context, tileSize);
 		}
 		else if (letter.equals("K")){
-			if (GameSurface.trayLetter_K == null){
-				GameSurface.trayLetter_K = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_k, tileSize, tileSize);
-				//GameSurface.trayLetter_K = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_K)));
-			}
-			return GameSurface.trayLetter_K;
+			return GameSurface.getTrayLetter_K(context, tileSize);
 		}
 		else if (letter.equals("L")){
-			if (GameSurface.trayLetter_L == null){
-				GameSurface.trayLetter_L = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_l, tileSize, tileSize);
-			//	GameSurface.trayLetter_L = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_L)));
-			}
-			return GameSurface.trayLetter_L;
+			return GameSurface.getTrayLetter_L(context, tileSize);
 		}
 		else if (letter.equals("M")){
-			if (GameSurface.trayLetter_M == null){
-				GameSurface.trayLetter_M = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_m, tileSize, tileSize);
-			//	GameSurface.trayLetter_M = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_M)));
-			}
-			return GameSurface.trayLetter_M;
+			return GameSurface.getTrayLetter_M(context, tileSize);
 		}
 		else if (letter.equals("N")){
-			if (GameSurface.trayLetter_N == null){
-				GameSurface.trayLetter_N = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_n, tileSize, tileSize);
-			//	GameSurface.trayLetter_N = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_N)));
-			}
-			return GameSurface.trayLetter_N;
+			return GameSurface.getTrayLetter_N(context, tileSize);
 		}
 		else if (letter.equals("O")){
-			if (GameSurface.trayLetter_O == null){
-				GameSurface.trayLetter_O = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_o, tileSize, tileSize);
-			//	GameSurface.trayLetter_O = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_O)));
-			}
-			return GameSurface.trayLetter_O;
+			return GameSurface.getTrayLetter_O(context, tileSize);
 		}
 		else if (letter.equals("P")){
-			if (GameSurface.trayLetter_P == null){
-				GameSurface.trayLetter_P = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_p, tileSize, tileSize);
-				//GameSurface.trayLetter_P = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_P)));
-			}
-			return GameSurface.trayLetter_P;
+			return GameSurface.getTrayLetter_P(context, tileSize);
 		}
 		else if (letter.equals("Q")){
-			if (GameSurface.trayLetter_Q == null){
-				GameSurface.trayLetter_Q = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_q, tileSize, tileSize);
-			//	GameSurface.trayLetter_Q = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_Q)));
-			}
-			return GameSurface.trayLetter_Q;
+			return GameSurface.getTrayLetter_Q(context, tileSize);
 		}
 		else if (letter.equals("R")){
-			if (GameSurface.trayLetter_R == null){
-				GameSurface.trayLetter_R = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_r, tileSize, tileSize);
-			//	GameSurface.trayLetter_R = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_R)));
-			}
-			return GameSurface.trayLetter_R;
+			return GameSurface.getTrayLetter_R(context, tileSize);
 		}
 		else if (letter.equals("S")){
-			if (GameSurface.trayLetter_S == null){
-				GameSurface.trayLetter_S = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_s, tileSize, tileSize);
-				//GameSurface.trayLetter_S = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_S)));
-			}
-			return GameSurface.trayLetter_S;
+			return GameSurface.getTrayLetter_S(context, tileSize);
 		}
 		else if (letter.equals("T")){
-			if (GameSurface.trayLetter_T == null){
-				GameSurface.trayLetter_T = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_t, tileSize, tileSize);
-				//GameSurface.trayLetter_T = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_T)));
-			}
-			return GameSurface.trayLetter_T;
+			return GameSurface.getTrayLetter_T(context, tileSize);
 		}
 		else if (letter.equals("U")){
-			if (GameSurface.trayLetter_U == null){
-				GameSurface.trayLetter_U = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_u, tileSize, tileSize);
-			//	GameSurface.trayLetter_U = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_U)));
-			}
-			return GameSurface.trayLetter_U;
+			return GameSurface.getTrayLetter_U(context, tileSize);
 		}
 		else if (letter.equals("V")){
-			if (GameSurface.trayLetter_V == null){
-				GameSurface.trayLetter_V = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_v, tileSize, tileSize);
-			//	GameSurface.trayLetter_V = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_V)));
-			}
-			return GameSurface.trayLetter_V;
+			return GameSurface.getTrayLetter_V(context, tileSize);
 		}
 		else if (letter.equals("W")){
-			if (GameSurface.trayLetter_W == null){
-				GameSurface.trayLetter_W = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_w, tileSize, tileSize);
-				//GameSurface.trayLetter_W = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_W)));
-			}
-			return GameSurface.trayLetter_W;
+			return GameSurface.getTrayLetter_W(context, tileSize);
 		}
 		else if (letter.equals("X")){
-			if (GameSurface.trayLetter_X == null){
-				GameSurface.trayLetter_X = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_letter_x, tileSize, tileSize);
-			//	GameSurface.trayLetter_X = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_file_X)));
-			}
-			return GameSurface.trayLetter_X;
+			return GameSurface.getTrayLetter_X(context, tileSize);
 		}
 		else if (letter.equals("Y")){
 			return GameSurface.getTrayLetter_Y(context, tileSize);
 		}
 		else if (letter.equals("Z")){
-			return GameSurface.trayLetter_Z;
+			return GameSurface.getTrayLetter_Z(context, tileSize);
 		}
 		else {
-			if (GameSurface.trayEmpty == null){
-				GameSurface.trayEmpty = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.tray_tile_empty_bg, tileSize, tileSize);
-				//GameSurface.trayEmpty = BitmapFactory.decodeResource(context.getResources(), Utils.getResourceId(context, context.getString(R.string.tray_letter_empty)));
-			}
-			return GameSurface.trayEmpty;
+			return GameSurface.getTrayEmpty(context, tileSize);
 		}
 
  	}
 	
- 	
+	private static Bitmap getPlayedLetterImage(Context context, String letter, int tileSize, int position){
+ 		
+		if (letter.equals("A")){
+			return GameSurface.getPlayedLetter_A(context, tileSize);
+		}
+		else if (letter.equals("B")){
+			return GameSurface.getPlayedLetter_B(context, tileSize);
+		}
+		else if (letter.equals("C")){
+			return GameSurface.getPlayedLetter_C(context, tileSize);
+		}
+		else if (letter.equals("D")){
+			return GameSurface.getPlayedLetter_D(context, tileSize);
+		}
+		else if (letter.equals("E")){
+			return GameSurface.getPlayedLetter_E(context, tileSize);
+		}
+		else if (letter.equals("F")){
+			return GameSurface.getPlayedLetter_F(context, tileSize);
+		}
+		else if (letter.equals("G")){
+			return GameSurface.getPlayedLetter_G(context, tileSize);
+		}
+		else if (letter.equals("H")){
+			return GameSurface.getPlayedLetter_H(context, tileSize);
+		}
+		else if (letter.equals("I")){
+			return GameSurface.getPlayedLetter_I(context, tileSize);
+		}
+		else if (letter.equals("J")){
+			return GameSurface.getPlayedLetter_J(context, tileSize);
+		}
+		else if (letter.equals("K")){
+			return GameSurface.getPlayedLetter_K(context, tileSize);
+		}
+		else if (letter.equals("L")){
+			return GameSurface.getPlayedLetter_L(context, tileSize);
+		}
+		else if (letter.equals("M")){
+			return GameSurface.getPlayedLetter_M(context, tileSize);
+		}
+		else if (letter.equals("N")){
+			return GameSurface.getPlayedLetter_N(context, tileSize);
+		}
+		else if (letter.equals("O")){
+			return GameSurface.getPlayedLetter_O(context, tileSize);
+		}
+		else if (letter.equals("P")){
+			return GameSurface.getPlayedLetter_P(context, tileSize);
+		}
+		else if (letter.equals("Q")){
+			return GameSurface.getPlayedLetter_Q(context, tileSize);
+		}
+		else if (letter.equals("R")){
+			return GameSurface.getPlayedLetter_R(context, tileSize);
+		}
+		else if (letter.equals("S")){
+			return GameSurface.getPlayedLetter_S(context, tileSize);
+		}
+		else if (letter.equals("T")){
+			return GameSurface.getPlayedLetter_T(context, tileSize);
+		}
+		else if (letter.equals("U")){
+			return GameSurface.getPlayedLetter_U(context, tileSize);
+		}
+		else if (letter.equals("V")){
+			return GameSurface.getPlayedLetter_V(context, tileSize);
+		}
+		else if (letter.equals("W")){
+			return GameSurface.getPlayedLetter_W(context, tileSize);
+		}
+		else if (letter.equals("X")){
+			return GameSurface.getPlayedLetter_X(context, tileSize);
+		}
+		else if (letter.equals("Y")){
+			return GameSurface.getPlayedLetter_Y(context, tileSize);
+		}
+		else if (letter.equals("Z")){
+			return GameSurface.getPlayedLetter_Z(context, tileSize);
+		}
+		else {
+			if (position == 6) {
+				return GameSurface.getPlayedEmpty_6(context, tileSize);
+			}
+			else if (position == 8) {
+				return GameSurface.getPlayedEmpty_8(context, tileSize);
+			}
+			else if (position == 10) {
+				return GameSurface.getPlayedEmpty_10(context, tileSize);
+			}
+			else {
+				return GameSurface.getPlayedEmpty(context, tileSize);
+			}
+		}
+
+ 	}
+	
 	private void setupGame(){
 		// Logger.d(TAG,"setupGame game turn=" + this.game.getTurn());
 		spinner = new CustomProgressDialog(this);
@@ -632,6 +982,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.preloadTask.execute();
 		
 		GameService.loadScoreboard(this, this.game);
+		
+		this.initializeHopper();
 	 	
 		//if (!this.game.isCompleted()){
 	//		this.fillGameState();
@@ -641,11 +993,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	this.setupFonts();
 
 	}
-	 private class PreLoadTask extends AsyncTask<Void, Void, Void> {
+	 
+	private class PreLoadTask extends AsyncTask<Void, Void, Void> {
 		  
 		 @Override
 		 protected Void doInBackground(Void... params) {
-			 if (GameSurface.this.game.isActive()){
+			// if (GameSurface.this.game.isActive()){
 					//go get words and store in memory in GameSurface
 					List<List<String>> letterSets = GameService.getSortedRaceLetterSets(game.getHopper());
 					/*
@@ -667,7 +1020,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					
 					//break up the fetch into batches of 50
 					int x = 0;
-					int processed = 0;
+			 
 					String[] lettersetArray = null;
 					
 					for (List<String> letterSet : letterSets){
@@ -679,12 +1032,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 						
 						String index = "";
 						
-						for (String s : letterSets.get(x)){
+						for (String s : letterSet){
 							index += s;
 						}
 						lettersetArray[x] = index.toLowerCase();
 						x += 1;
-						processed += 1;
+			 
 						
 						if (x >= 50){
 							GameSurface.this.possibleWords.addAll(wordService.getMatchingWordsFromIndexArray(lettersetArray));
@@ -706,12 +1059,9 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 						 GameSurface.this.game.setNumPossibleWords(GameSurface.this.possibleWords.size());
 						 GameService.saveGame(GameSurface.this.game);
 					 }
-				}
-			
 	    	 
 	    	 return null;
-	    	 
-	    	 //return game; 
+
 	     }
 
 	   //  protected void onProgressUpdate(Integer... progress) {
@@ -822,16 +1172,469 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 			 v.getId() == R.id.bLetter1 || v.getId() == R.id.bLetter2 || v.getId() == R.id.bLetter3 || v.getId() == R.id.bLetter4 || v.getId() == R.id.bLetter5 ||
 	 			 v.getId() == R.id.bLetter6 || v.getId() == R.id.bLetter7 || v.getId() == R.id.bLetter8 || v.getId() == R.id.bLetter9 || v.getId() == R.id.bLetter10
 	 			 ){
-	 		this.handleLetterOnClick(v.getId());
+	 		this.handleTrayOnClick(v.getId());
 	 	}
+		else if (
+	 			 v.getId() == R.id.ivPlayedLetter1 || v.getId() == R.id.ivPlayedLetter2 || v.getId() == R.id.ivPlayedLetter3 || v.getId() == R.id.ivPlayedLetter4 || v.getId() == R.id.ivPlayedLetter5 ||
+	 			 v.getId() == R.id.ivPlayedLetter6 || v.getId() == R.id.ivPlayedLetter7 || v.getId() == R.id.ivPlayedLetter8 || v.getId() == R.id.ivPlayedLetter9 || v.getId() == R.id.ivPlayedLetter10
+	 			 ){
+	 		this.handlePlayedLetterOnClick(v.getId());
+	 	}
+	 	else if (v.getId() == R.id.bRecall){
+	 		this.handleRecall();
+	 	}
+	 	else if (v.getId() == R.id.bShuffle){
+	 		this.handleShuffle();
+	 	}
+	 	else if (v.getId() == R.id.bPlay){
+	 		this.handlePlay();
+	 	}
+
+	}
+
+	private void loadPlayedTilesWithCurrentWord(){
+ 
+		ivPlayedLetter1.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 1 ? this.currentWord.get(0) : ""), this.playedLetterTileSize, 1));
+		ivPlayedLetter2.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 2 ? this.currentWord.get(1) : ""), this.playedLetterTileSize, 2));
+		ivPlayedLetter3.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 3 ? this.currentWord.get(2) : ""), this.playedLetterTileSize, 3));
+		ivPlayedLetter4.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 4 ? this.currentWord.get(3) : ""), this.playedLetterTileSize, 4));
+		ivPlayedLetter5.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 5 ? this.currentWord.get(4) : ""), this.playedLetterTileSize, 5));
+		ivPlayedLetter6.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 6 ? this.currentWord.get(5) : ""), this.playedLetterTileSize, 6));
+		ivPlayedLetter7.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 7 ? this.currentWord.get(6) : ""), this.playedLetterTileSize, 7));
+		ivPlayedLetter8.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 8 ? this.currentWord.get(7) : ""), this.playedLetterTileSize, 8));
+		ivPlayedLetter9.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 9 ? this.currentWord.get(8) : ""), this.playedLetterTileSize, 9));
+		ivPlayedLetter10.setImageBitmap(GameSurface.getPlayedLetterImage(this, (this.currentWord.size() >= 10 ? this.currentWord.get(9) : ""), this.playedLetterTileSize, 10));
+
+	}
+
+	
+	private void initializePlayedTiles(){
+		ivPlayedLetter1.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter2.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter3.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter4.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter5.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter6.setImageBitmap(GameSurface.getPlayedEmpty_6(this, playedLetterTileSize));
+		ivPlayedLetter7.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter8.setImageBitmap(GameSurface.getPlayedEmpty_8(this, playedLetterTileSize));
+		ivPlayedLetter9.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
+		ivPlayedLetter10.setImageBitmap(GameSurface.getPlayedEmpty_10(this, playedLetterTileSize));
+
 	}
 	
-	private void handleLetterOnClick(int id){
-		if (id == R.id.bLetter1){
-			
-			R.id.
+	private void initializeTray(){
+		
+		bLetter1.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(0), letterTileSize));
+		bLetter2.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(1), letterTileSize));
+		bLetter3.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(2), letterTileSize));
+		bLetter4.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(3), letterTileSize));
+		bLetter5.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(4), letterTileSize));
+		bLetter6.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(5), letterTileSize));
+		bLetter7.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(6), letterTileSize));
+		bLetter8.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(7), letterTileSize));
+		bLetter9.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(8), letterTileSize));
+		bLetter10.setImageBitmap(GameSurface.getTrayLetterImage(this, this.hopper.get(9), letterTileSize));
+	}
+	
+	private void initializeHopper(){
+		this.hopper.clear();
+		for (String letter : this.game.getHopper()){
+			this.hopper.add(letter);
+		}
+		for (String letter : this.game.getHopper()){
+			this.hopperState.add(letter);
+		}
+	}
+	
+	private void handleRecall(){
+		
+		this.initializePlayedTiles();
+		this.initializeHopper();
+		this.initializeTray();
+		this.currentWord.clear();
+		this.updatePointsView();
+		
+		//reset points
+		
+	}
+	private void updatePointsView(){
+		int points = this.calculatePoints();
+		
+		if (points > 0){
+ 			tvNumPoints.setText(String.format(this.getString(R.string.scoreboard_num_points),points));
+ 			tvNumPoints.setVisibility(View.VISIBLE);
+		}
+		else{
+ 			tvNumPoints.setVisibility(View.INVISIBLE);
+		}
+	}
+	
+	
+	private int calculatePoints(){
+		
+		if (this.currentWord.size() < 3){ return 0; }
+		
+		String word = "";
+		
+		int points = 0;
+		
+		for (String letter : this.currentWord){
+			points += AlphabetService.getLetterValue(letter);
+			word += letter;
 		}
 		
+		//if not a valid word no points are calculated
+		if (!this.possibleWords.contains(word.toLowerCase())) { return 0; }
+		
+		if (this.currentWord.size() == 10){
+			points += 30; ///make this a constant on int resource
+		}
+		else if (this.currentWord.size() >= 8){
+			points += 15;
+		}
+		else if (this.currentWord.size() >= 6){
+			points += 5;
+		}
+		
+		return points;
+	}
+	
+	private void handlePlay(){
+		//<string name="game_surface_race_word_too_short">words must be at least 3 letters long</string>
+		// <string name="game_surface_race_word_opponent_played">%1$s has already played %2$s</string>	
+		// <string name="game_surface_race_word_already_played">you have already played %2$s</string> 
+		// <string name="game_surface_race_word_invalid">%1$s has already played %2$s</string>
+		String word = "";
+ 
+		for (String letter : this.currentWord){
+			word += letter;
+		}
+		
+		if (this.currentWord.size() < this.getResources().getInteger(R.integer.minWordLength)){
+			new CustomToast(this, this.getString(R.string.game_surface_race_word_too_short)).show();
+			return;
+	 	}
+		if (this.wordsPlayedByOpponent.contains(word)){
+			new CustomToast(this, String.format(this.getString(R.string.game_surface_race_word_opponent_played), this.game.getOpponent().getName(), word)).show();
+			return;
+	 	}
+		
+		if (this.wordsPlayedByPlayer.contains(word)){
+			new CustomToast(this, String.format(this.getString(R.string.game_surface_race_word_already_played), word)).show();
+			return;
+	 	}
+		
+		if (!this.possibleWords.contains(word.toLowerCase())){
+			new CustomToast(this, String.format(this.getString(R.string.game_surface_race_word_invalid), word)).show();
+			return;
+	 	}
+		int points = this.calculatePoints();
+		
+		this.handleRecall();
+		this.wordsPlayedByPlayer.add(word);
+		 
+		
+		final PlayedWord playedWord = new PlayedWord();
+		playedWord.setPlayedDate(new Date());
+		playedWord.setOpponentPlay(false);
+		playedWord.setPointsScored(points);
+		playedWord.setWord(word);
+		
+		//scroll.fullScroll(View.FOCUS_DOWN) also should work.
+		this.wordListPlayedByPlayer.add(playedWord);
+		//this.llPlayerWords.addView(this.getPlayedWordView(playedWord));
+		
+		//this.playerListadapter.addToList(playedWord);
+		//this.playerListadapter.add(playedWord);
+	 // context.adapter.updateList(context.workingList); 
+		// this.playerListadapter.
+		 runOnUiThread(new Runnable() {
+		        public void run() {
+		            // use data here
+		        //	unloadPlaySpinner();
+		        	GameSurface.this.llPlayerWords.addView(GameSurface.this.getPlayedWordView(playedWord));
+		        //	GameSurface.this.playerListadapter.notifyDataSetChanged();
+		        }
+		    });
+		    
+		//this.playerListadapter.notifyDataSetChanged();
+		
+		this.game.getPlayedWords().add(playedWord);
+		this.game.setPlayerScore(this.game.getPlayerScore() + points);
+		
+		this.tvPlayerScore.setText(String.valueOf(this.game.getPlayerScore()));
+	 	
+		this.tvWordsLeft.setText(String.format(this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - game.getPlayedWords().size()));
+ 
+		//save game upon completion, not here
+	}
+	
+	public View getPlayedWordView(PlayedWord word) {
+ 
+		View view = this.inflater.inflate(R.layout.wordlistitem, null);
+ 	 	TextView tvWord = (TextView)view.findViewById(R.id.tvWord);
+ 	 	TextView tvPoints = (TextView)view.findViewById(R.id.tvPoints);
+ 	 	
+ 	 	tvWord.setText(word.getWord());
+ 	 	tvPoints.setText(String.valueOf(word.getPointsScored()));
+
+ 	 	
+	    view.setTag(word);
+	    return view;
+  	}
+
+	
+	private void initializePlayerWordLists(){
+/*		PlayedWord playedWord = new PlayedWord();
+		playedWord.setPlayedDate(new Date());
+		playedWord.setOpponentPlay(false);
+		playedWord.setPointsScored(50);
+		playedWord.setWord("word123455");
+		
+	
+		
+	 	this.playerListadapter = new PlayedWordAdapter(this, this.wordListPlayedByPlayer);
+
+		this.lvPlayer.setAdapter(this.playerListadapter); 
+		
+		this.wordListPlayedByPlayer.add(playedWord);
+		//this.playerListadapter.addToList(playedWord);
+		this.playerListadapter.notifyDataSetChanged();
+	*/	
+	}
+	
+	private void handleShuffle(){
+		//only allow shuffle if all letters are in tray?
+		Boolean allow = true;
+		
+		for (String letter : this.hopper){
+			if (letter.equals("")){
+				allow = false;
+				break;
+			}
+		}
+		
+		if (allow){
+			Collections.shuffle(this.game.getHopper());
+			
+			this.initializeHopper();
+			this.initializeTray();
+		}
+	
+		//save game at end or between rounds
+	}
+	
+	private void handlePlayedLetterOnClick(int id){
+		if (!this.game.isStarted()) { return; }
+		 int opening = this.findFirstOpenTraySlot();
+
+		 if (id == R.id.ivPlayedLetter1){
+			if (this.currentWord.size() < 1 || this.currentWord.get(0).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(0));
+			this.currentWord.remove(0);
+		 }
+		 else if (id == R.id.ivPlayedLetter2){
+			if (this.currentWord.size() < 2 || this.currentWord.get(1).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(1));
+			this.currentWord.remove(1);
+		 }
+		 else if (id == R.id.ivPlayedLetter3){
+			if (this.currentWord.size() < 3 || this.currentWord.get(2).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(2));
+			this.currentWord.remove(2);
+		 }
+		 else if (id == R.id.ivPlayedLetter4){
+			if (this.currentWord.size() < 4 || this.currentWord.get(3).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(3));
+			this.currentWord.remove(3);
+		 }
+		 else if (id == R.id.ivPlayedLetter5){
+			if (this.currentWord.size() < 5 || this.currentWord.get(4).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(4));
+			this.currentWord.remove(4);
+		 }
+		 else if (id == R.id.ivPlayedLetter6){
+		    if (this.currentWord.size() < 6 || this.currentWord.get(5).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(5));
+			this.currentWord.remove(5);
+		 } 
+		 else if (id == R.id.ivPlayedLetter7){
+			if (this.currentWord.size() < 7 || this.currentWord.get(6).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(6));
+			this.currentWord.remove(6);
+		 }
+		 else if (id == R.id.ivPlayedLetter8){
+			if (this.currentWord.size() < 8 || this.currentWord.get(7).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(7));
+			this.currentWord.remove(7);
+		 }
+		 else if (id == R.id.ivPlayedLetter9){
+			if (this.currentWord.size() < 9 || this.currentWord.get(8).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(8));
+			this.currentWord.remove(8);
+		 }
+		 else if (id == R.id.ivPlayedLetter10){
+			if (this.currentWord.size() < 10 || this.currentWord.get(9).equals("")) { return; }
+			this.hopper.set(opening, this.currentWord.get(9));
+			this.currentWord.remove(9);
+		 }
+		 
+		 this.loadPlayedTilesWithCurrentWord();
+		 this.initializeTray();
+		 this.updatePointsView();
+	}
+	
+	private void handleTrayOnClick(int id){
+		if (!this.game.isStarted()) { return; }
+		int locationForClickedLetter = findFirstOpenWordSlot();
+		
+		ImageView ivLocation = this.ivPlayedLetter10;
+		if (locationForClickedLetter == 1) {
+			ivLocation = this.ivPlayedLetter1;
+		}
+		else if (locationForClickedLetter == 2) {
+			ivLocation = this.ivPlayedLetter2;
+		}
+		else if (locationForClickedLetter == 3) {
+			ivLocation = this.ivPlayedLetter3;
+		}
+		else if (locationForClickedLetter == 4) {
+			ivLocation = this.ivPlayedLetter4;
+		}
+		else if (locationForClickedLetter == 5) {
+			ivLocation = this.ivPlayedLetter5;
+		}
+		else if (locationForClickedLetter == 6) {
+			ivLocation = this.ivPlayedLetter6;
+		}
+		else if (locationForClickedLetter == 7) {
+			ivLocation = this.ivPlayedLetter7;
+		}
+		else if (locationForClickedLetter == 8) {
+			ivLocation = this.ivPlayedLetter8;
+		}
+		else if (locationForClickedLetter == 9) {
+			ivLocation = this.ivPlayedLetter9;
+		}
+ 
+	 	
+		if (id == R.id.bLetter1){
+			 if (this.hopper.get(0).equals("")){ return; }
+			 ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(0), playedLetterTileSize, 1));
+			 this.bLetter1.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter,this.hopper.get(0));
+			 this.hopper.set(0, "");
+		}
+		else if (id == R.id.bLetter2){
+			 if (this.hopper.get(1).equals("")){ return; }
+
+			 ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(1), playedLetterTileSize, 2));
+			 this.bLetter2.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter,this.hopper.get(1));
+			 this.hopper.set(1, "");
+		}
+		else if (id == R.id.bLetter3){
+			 if (this.hopper.get(2).equals("")){ return; }
+
+			 ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(2), playedLetterTileSize, 3));
+			 this.bLetter3.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter,this.hopper.get(2));
+			 this.hopper.set(2, "");
+		}
+		else if (id == R.id.bLetter4){
+			 if (this.hopper.get(3).equals("")){ return; }
+
+			  ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(3), playedLetterTileSize, 4));
+			 this.bLetter4.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(3));
+			 this.hopper.set(3, "");
+		} 
+		else if (id == R.id.bLetter5){
+			 if (this.hopper.get(4).equals("")){ return; }
+
+			ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(4), playedLetterTileSize, 5));
+			 this.bLetter5.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(4));
+			 this.hopper.set(4, "");
+		}
+		else if (id == R.id.bLetter6){
+			 if (this.hopper.get(5).equals("")){ return; }
+
+			ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(5), playedLetterTileSize, 6));
+			 this.bLetter6.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(5));
+			 this.hopper.set(5, "");
+		}
+		else if (id == R.id.bLetter7){
+			 if (this.hopper.get(6).equals("")){ return; }
+
+			ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(6), playedLetterTileSize, 7));
+			 this.bLetter7.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(6));
+			 this.hopper.set(6, "");
+		}
+		else if (id == R.id.bLetter8){
+			 if (this.hopper.get(7).equals("")){ return; }
+
+			ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(7), playedLetterTileSize, 8));
+			 this.bLetter8.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(7));
+			 this.hopper.set(7, "");
+		}
+		else if (id == R.id.bLetter9){
+			 if (this.hopper.get(8).equals("")){ return; }
+
+			ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(8), playedLetterTileSize, 9));
+			 this.bLetter9.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(8));
+			 this.hopper.set(8, "");
+		}
+		else if (id == R.id.bLetter10){
+			 if (this.hopper.get(9).equals("")){ return; }
+
+			ivLocation.setImageBitmap(GameSurface.getPlayedLetterImage(this, this.hopper.get(9), playedLetterTileSize, 10));
+			 this.bLetter10.setImageBitmap(GameSurface.getTrayLetterImage(this, "", letterTileSize));
+			 addLetterToCurrentWord(locationForClickedLetter ,this.hopper.get(9));
+			 this.hopper.set(9, "");
+		}
+		
+		this.updatePointsView();
+				
+	}
+	
+	private int findFirstOpenTraySlot(){
+		int currentSize = this.hopper.size();
+		//int location = currentWord.size() + 1;
+		for (int i = 0; i < currentSize; i++){
+			if (this.hopper.get(i).equals("")){
+				return i;
+			}
+			
+		}
+		
+		return currentSize + 1;
+	}
+	
+	private int findFirstOpenWordSlot(){
+		int currentSize = currentWord.size();
+		//int location = currentWord.size() + 1;
+		for (int i = 0; i < currentSize; i++){
+			if (currentWord.get(i).equals("")){
+				return i + 1;
+			}
+		}
+		
+		return currentSize + 1;
+	}
+	
+	private void addLetterToCurrentWord(int location, String letter){
+		if (currentWord.size() - 1 >= location){
+			currentWord.set(location, letter);
+		}
+		else{
+			//add to end
+			currentWord.add(letter);
+		}
 	}
 	
 	 private void setGameId(){
@@ -1380,4 +2183,68 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			bStart.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 		}
 		
+		private class PlayedWordAdapter extends BaseAdapter {
+		   	  private final GameSurface context;
+		   	  private List<PlayedWord>  values;
+		   	  private  int wordCount;
+		   	  LayoutInflater inflater;
+
+		   	  
+		   	//  public ArrayList<Integer> selectedIds = new ArrayList<Integer>();
+
+		   	  public PlayedWordAdapter(GameSurface context, List<PlayedWord> values) {
+		   		 // 	super();
+		    	    this.context = context;
+		    	    this.values = values;
+		    	    this.wordCount = values.size();
+		    	    
+		    	    this.inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		    	  }
+
+			   	 
+		    	  @Override
+		    	  public View getView(int position, View rowView, ViewGroup parent) {
+		    		 
+		    		  if ( rowView == null ) {
+		    			  rowView = inflater.inflate(R.layout.wordlistitem, parent, false);
+		    		  }
+		    		  
+			    	   PlayedWord word = values.get(position);
+			    	 
+			    	   TextView tvWord = (TextView) rowView.findViewById(R.id.tvWord);
+			     	   
+			    	   tvWord.setTypeface(ApplicationContext.getScoreboardFontTypeface());
+ 
+			    	   tvWord.setText(word.getWord());
+		 	     	   
+			    	   rowView.setTag(word.getWord());
+			    	   return rowView;
+		    	  }
+		    	    @SuppressLint("NewApi")
+					public void addToList(PlayedWord word){ 
+				   	     
+			   	    	 this.values.add(word);
+			   	     }
+				@Override
+				public int getCount() {
+					// TODO Auto-generated method stub
+					return this.wordCount;
+				}
+
+				@Override
+				public Object getItem(int position) {
+					// TODO Auto-generated method stub
+					return this.values.get(position);
+				}
+
+				@Override
+				public long getItemId(int position) {
+					// TODO Auto-generated method stub
+					return position;
+				} 
+				
+				
+				} 		  
+		 
+		     
 }

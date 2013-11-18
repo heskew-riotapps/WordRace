@@ -45,13 +45,14 @@ public class GameService {
 		 
 		 TextView tvPlayerName = (TextView)context.findViewById(R.id.tvPlayerName);
 		 TextView tvWordsLeft = (TextView)context.findViewById(com.riotapps.wordrace.R.id.tvWordsLeft);
-	 
+		 TextView tvNumPoints = (TextView)context.findViewById(R.id.tvNumPoints);
 		 
 		 tvPlayerScore.setTypeface(ApplicationContext.getScoreboardFontTypeface());
 		 tvOpponentName.setTypeface(ApplicationContext.getScoreboardFontTypeface());
 		 tvOpponentScore.setTypeface(ApplicationContext.getScoreboardFontTypeface());
 		 tvPlayerName.setTypeface(ApplicationContext.getScoreboardFontTypeface());
 		 tvWordsLeft.setTypeface(ApplicationContext.getScoreboardFontTypeface());
+		 tvNumPoints.setTypeface(ApplicationContext.getScoreboardFontTypeface());
 	 
 	 
 		 tvPlayerScore.setText(String.valueOf(game.getPlayerScore()));
@@ -64,13 +65,7 @@ public class GameService {
 		 int opponentImageId = context.getResources().getIdentifier(context.getString(R.string.namespace) + ":drawable/" + o.getDrawableByMode(Constants.OPPONENT_IMAGE_MODE_SMALL), null, null);
 		 ivOpponent.setImageResource(opponentImageId);
 
-		 
-		 if (game.getHopper().size() == 1){
-	 		 tvWordsLeft.setText(com.riotapps.wordrace.R.string.scoreboard_1_word_left); 
-		 }
-		 else{
-			 tvWordsLeft.setText(String.format(context.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - game.getPlayedWords().size()));
-		 }
+		 tvWordsLeft.setText(String.format(context.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - game.getPlayedWords().size()));
 
 	 }
 	
