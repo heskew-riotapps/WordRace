@@ -42,6 +42,9 @@ public class Game {
 	
 	@SerializedName("n_w")
 	private int numPossibleWords;
+	
+	@SerializedName("g_t")
+	private int gameType = 0;
 
 	public Opponent getOpponent(){
 		return OpponentService.getOpponent(this.opponentId);
@@ -128,5 +131,25 @@ public class Game {
 	public void setNumPossibleWords(int numPossibleWords) {
 		this.numPossibleWords = numPossibleWords;
 	}
+	public int getGameType() {
+		return gameType;
+	}
+	public void setGameType(int gameType) {
+		this.gameType = gameType;
+	}
 	
+	public boolean isOriginalType()
+	{
+		return this.gameType == 0;
+	}
+	
+	public boolean isSpeedRoundType()
+	{
+		return this.gameType == 1;
+	}
+	
+	public boolean isDoubleTimeType()
+	{
+		return this.gameType == 2;
+	}
 }

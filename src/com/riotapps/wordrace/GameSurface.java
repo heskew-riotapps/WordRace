@@ -84,7 +84,6 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private TextView tvPlayerScore;
 	 private ListView lvOpponent;
 	 private ListView lvPlayer;
-	 private LinearLayout llPlayerWords;
 	 private PlayedWordAdapter playerListadapter;
  
 	private	LayoutInflater inflater;
@@ -622,7 +621,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.tvPlayerScore = (TextView)this.findViewById(R.id.tvPlayerScore);
 		this.lvOpponent = (ListView)this.findViewById(R.id.lvOpponent);
 		this.lvPlayer = (ListView)this.findViewById(R.id.lvPlayer);
-		this.llPlayerWords = (LinearLayout)this.findViewById(R.id.llPlayerWords);
+		//this.llPlayerWords = (LinearLayout)this.findViewById(R.id.llPlayerWords);
 		
 		this.bLetter1 = (ImageView) findViewById(R.id.bLetter1);
 		this.bLetter2 = (ImageView) findViewById(R.id.bLetter2);
@@ -1343,12 +1342,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		//scroll.fullScroll(View.FOCUS_DOWN) also should work.
 		this.wordListPlayedByPlayer.add(playedWord);
 		//this.llPlayerWords.addView(this.getPlayedWordView(playedWord));
-		
-		//this.playerListadapter.addToList(playedWord);
+		this.playerListadapter.notifyDataSetChanged();
+		this.lvPlayer.setSelection(this.playerListadapter.getCount() - 1);
+		// this.playerListadapter.addToList(playedWord);
 		//this.playerListadapter.add(playedWord);
 	 // context.adapter.updateList(context.workingList); 
 		// this.playerListadapter.
-		 runOnUiThread(new Runnable() {
+		/* runOnUiThread(new Runnable() {
 		        public void run() {
 		            // use data here
 		        //	unloadPlaySpinner();
@@ -1356,7 +1356,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		        //	GameSurface.this.playerListadapter.notifyDataSetChanged();
 		        }
 		    });
-		    
+		    */
 		//this.playerListadapter.notifyDataSetChanged();
 		
 		this.game.getPlayedWords().add(playedWord);
@@ -1368,39 +1368,15 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
  
 		//save game upon completion, not here
 	}
-	
-	public View getPlayedWordView(PlayedWord word) {
- 
-		View view = this.inflater.inflate(R.layout.wordlistitem, null);
- 	 	TextView tvWord = (TextView)view.findViewById(R.id.tvWord);
- 	 	TextView tvPoints = (TextView)view.findViewById(R.id.tvPoints);
- 	 	
- 	 	tvWord.setText(word.getWord());
- 	 	tvPoints.setText(String.valueOf(word.getPointsScored()));
-
- 	 	
-	    view.setTag(word);
-	    return view;
-  	}
+	 
 
 	
 	private void initializePlayerWordLists(){
-/*		PlayedWord playedWord = new PlayedWord();
-		playedWord.setPlayedDate(new Date());
-		playedWord.setOpponentPlay(false);
-		playedWord.setPointsScored(50);
-		playedWord.setWord("word123455");
-		
-	
-		
+
 	 	this.playerListadapter = new PlayedWordAdapter(this, this.wordListPlayedByPlayer);
 
 		this.lvPlayer.setAdapter(this.playerListadapter); 
-		
-		this.wordListPlayedByPlayer.add(playedWord);
-		//this.playerListadapter.addToList(playedWord);
-		this.playerListadapter.notifyDataSetChanged();
-	*/	
+	 
 	}
 	
 	private void handleShuffle(){
@@ -2183,7 +2159,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			bStart.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 		}
 		
-		private class PlayedWordAdapter extends BaseAdapter {
+		private class PlayedWordAdapter extends ArrayAdapter<PlayedWord> {
 		   	  private final GameSurface context;
 		   	  private List<PlayedWord>  values;
 		   	  private  int wordCount;
@@ -2193,7 +2169,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		   	//  public ArrayList<Integer> selectedIds = new ArrayList<Integer>();
 
 		   	  public PlayedWordAdapter(GameSurface context, List<PlayedWord> values) {
-		   		 // 	super();
+		   		  	super(context, R.layout.wordlistitem, values); 
 		    	    this.context = context;
 		    	    this.values = values;
 		    	    this.wordCount = values.size();
@@ -2220,31 +2196,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			    	   rowView.setTag(word.getWord());
 			    	   return rowView;
 		    	  }
-		    	    @SuppressLint("NewApi")
-					public void addToList(PlayedWord word){ 
-				   	     
-			   	    	 this.values.add(word);
-			   	     }
-				@Override
-				public int getCount() {
-					// TODO Auto-generated method stub
-					return this.wordCount;
-				}
-
-				@Override
-				public Object getItem(int position) {
-					// TODO Auto-generated method stub
-					return this.values.get(position);
-				}
-
-				@Override
-				public long getItemId(int position) {
-					// TODO Auto-generated method stub
-					return position;
-				} 
-				
-				
-				} 		  
+		    	
+			} 		  
 		 
 		     
 }

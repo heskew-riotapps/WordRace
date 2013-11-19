@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="word_list_area_background">#ee5b92</color> 
     <color name="button_area_background">#ee5b92</color> 
     <color name="scoreboard_background">#e03b7d</color> <!-- d42931 ae1d18 CD96CD DB70DB 024bc4 137ccd 64908A -->
     <color name="tray_background">#29cdf0</color>

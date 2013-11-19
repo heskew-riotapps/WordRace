@@ -31,59 +31,55 @@
 		    />
     </RelativeLayout>
        <LinearLayout
-           android:baselineAligned="false"
          	android:layout_below="@id/rlCountdown"
+         	android:paddingLeft="5dp"
+         	android:paddingRight="5dp"
            	android:layout_width="fill_parent"
 	     	android:layout_height="200dp"
 	     	android:id="@+id/rlWordLists"
 	     	android:orientation="horizontal"
-	     	android:background="@color/button_area_background"
+	     	android:background="@color/word_list_area_background"
 	   >
-		<ScrollView   
-	      android:id="@+id/svOpponentWords"
-    	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent" 
-    	android:fadingEdge="none"
-   		android:layout_weight="1"
-   
- 		
-    	 >
-		<LinearLayout
-		    
-		    android:id="@+id/llPlayerWords"
-		   	android:orientation="vertical"
-		   	android:layout_width="fill_parent"
-		   	android:layout_height="wrap_content"
-		    />
-				    
-		</ScrollView>
-		<ScrollView   
-	      	android:id="@+id/svPlayerWords"
-	      	android:layout_width="fill_parent"
-    		android:layout_height="fill_parent" 
-    		android:fadingEdge="none"
-   
- 		
-    	 >
-		<LinearLayout
-		   	android:id="@+id/llOpponentWords"
-		   	android:orientation="vertical"
-		   	android:layout_width="fill_parent"
-		   	android:layout_height="fill_parent"
-		    />
-				    
-		</ScrollView>		        
-     		<ListView 
-			    android:layout_weight="1"
-       			android:id="@+id/lvPlayer" 
-       			android:layout_height="fill_parent" 
-       			
-        	/>
-     		<ListView 
-    		    android:layout_weight="1"
-       			android:id="@+id/lvOpponent"
-       			android:layout_height="fill_parent" 
-        	/>
+			 <LinearLayout
+			     android:orientation="vertical"
+			     android:layout_weight="1"
+			     >
+			     <TextView 
+			         android:id="@+id/tvOpponentWordListTitle"
+			         android:layout_width="fill_parent"
+			         android:gravity="center"
+			         android:layout_height="wrap_content"
+			         android:paddingTop="2dp"
+			         android:paddingBottom="2dp"
+			         android:text="opponent's words"
+			         />
+		 	     <ListView 
+				    android:layout_width="fill_parent"
+	       			android:id="@+id/lvOpponent"
+	       			android:layout_height="fill_parent" 
+	        	/>   
+        	</LinearLayout>
+        	<LinearLayout
+        	    android:layout_weight="1"
+        	    android:orientation="vertical"
+        	    >
+		 	     <TextView 
+			         android:id="@+id/tvPlayerWordListTitle"
+			         android:layout_width="fill_parent"
+			         android:gravity="center"
+			         android:layout_height="wrap_content"
+			         android:paddingTop="2dp"
+			         android:paddingBottom="2dp"
+			         android:text="your words"
+			         />
+	     		<ListView 
+				    android:layout_width="fill_parent"
+	       			android:id="@+id/lvPlayer" 
+	       			android:layout_height="fill_parent" 
+	       			
+	        	/>
+     		</LinearLayout>
+     		
 			
     	</LinearLayout>
 	
