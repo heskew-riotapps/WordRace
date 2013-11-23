@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="word_list_area_background">#ee5b92</color> 
+    <color name="word_list_area_middle_border">#670099</color>
+    <color name="word_list_area_player_title_text">#ffffff</color>
+    <color name="word_list_area_opponent_title_text">#ffffff</color>
+    <color name="word_list_area_player_title_background">#ff6501</color> 
+    <color name="word_list_area_opponent_title_background">#ff6501</color>
+    <color name="word_list_area_opponent_background">#fff5ee</color> 
+    <color name="word_list_area_player_background">#fff5ee</color> 
+    <color name="word_list_area_background">#cada39</color> 
     <color name="button_area_background">#ee5b92</color> 
     <color name="scoreboard_background">#e03b7d</color> <!-- d42931 ae1d18 CD96CD DB70DB 024bc4 137ccd 64908A -->
     <color name="tray_background">#29cdf0</color>

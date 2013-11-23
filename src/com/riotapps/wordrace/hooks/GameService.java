@@ -100,6 +100,11 @@ public class GameService {
     	 
 	}
 	
+	public static void completeGame(Game game){
+		game.setStatus(4);
+		saveGame(game);
+	}
+	
 	public static void saveGame(Game game){
 		//game.getPlayerGames().get(1).getPlacedResults().clear();
 		GameData.saveGame(game);
@@ -125,17 +130,14 @@ public class GameService {
 	public static List<List<String>> getSortedRaceLetterSets(List<String> raceLetters){
 		List<List<String>> letterSets = new ArrayList<List<String>>();
 		
-		//letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 2));
 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 3));
 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 4));
 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 5));
 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 6));
-		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 7));
+ 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 7));
 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 8));
-		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 9));
-		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 10));
-	//	letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 11));
-	//	letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 12));
+ 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 9));
+ 		letterSets.addAll(getSortedRaceLetterSetsByLength(raceLetters, 10));
 		
 		return letterSets;
 	
@@ -145,8 +147,10 @@ public class GameService {
 		 //so if the tray letters are P, R, T, A, L, B, Y and the setLength is 4
 		 //return P, R, T, A...P, R, T, L,...P, R, T, B...etc
 		 List<List<String>> letterSets = new ArrayList<List<String>>();
+		 
+		 Collections.sort(raceLetters);
 	
-		 //we only need 6 indexes here because if a set length of 12 is requested
+		 //we only need 9 indexes here because if a set length of 10 is requested
 		 //all letters are returned as the only eligible letter set
 		 int x1 = 0;
 		 int x2 = 1;
@@ -155,7 +159,7 @@ public class GameService {
 		 int x5 = 4;
 		 int x6 = 5;
 		 int x7 = 6;
-		 int x8 = 7;
+		 int x8 = 7; 
 		 int x9 = 8;
 	//	 int x10 = 9;
 	//	 int x11 = 10;
@@ -203,9 +207,9 @@ public class GameService {
 					if (setLength >= 3) { letterSet.add(raceLetters.get(x3)); }
 					if (setLength >= 4) { letterSet.add(raceLetters.get(x4)); }
 					if (setLength >= 5) { letterSet.add(raceLetters.get(x5)); }
-					if (setLength == 6) { letterSet.add(raceLetters.get(x6)); }
-					if (setLength == 7) { letterSet.add(raceLetters.get(x7)); }
-					if (setLength == 8) { letterSet.add(raceLetters.get(x8)); }
+					if (setLength >= 6) { letterSet.add(raceLetters.get(x6)); }
+					if (setLength >= 7) { letterSet.add(raceLetters.get(x7)); }
+					if (setLength >= 8) { letterSet.add(raceLetters.get(x8)); }
 					if (setLength == 9) { letterSet.add(raceLetters.get(x9)); }
 		//			if (setLength == 10) { letterSet.add(raceLetters.get(x10)); }
 		//			if (setLength == 11) { letterSet.add(raceLetters.get(x11)); }
@@ -222,20 +226,20 @@ public class GameService {
 					//	x10 = x9+1;
 					//	x11 = x9+2;
 						}
-					else if (setLength == 8 && x8 < (maxIndex - (setLength - 8))){
+					else if (setLength >= 8 && x8 < (maxIndex - (setLength - 8))){
 						x8 += 1;
 						x9 = x8+1;
 					//	x10 = x8+2;
 					//	x11 = x8+3;
 					}
-					else if (setLength == 7 && x7 < (maxIndex - (setLength - 7))){
+					else if (setLength >= 7 && x7 < (maxIndex - (setLength - 7))){
 						x7 += 1;
 						x8 = x7+1;
 						x9 = x7+2;
 				//		x10 = x7+3;
 				//		x11 = x7+4;
 						}
-					else if (setLength == 6 && x6 < (maxIndex - (setLength - 6))){
+					else if (setLength >= 6 && x6 < (maxIndex - (setLength - 6))){
 						x6 += 1;
 						x7 = x6+1;
 						x8 = x6+2;

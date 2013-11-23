@@ -90,7 +90,7 @@ custom color for pressed state
         public static final int player_image_background_color=0x7f080033;
         public static final int player_image_border_color=0x7f080032;
         public static final int pressed_color=0x7f080017;
-        public static final int progress_background=0x7f080040;
+        public static final int progress_background=0x7f080047;
         public static final int progress_background_color=0x7f080029;
         /**  3366dd 
          */
@@ -107,10 +107,10 @@ custom color for pressed state
         public static final int store_item_title_color=0x7f080039;
         /**  #FF0000 
          */
-        public static final int sub_scoreboard_background=0x7f08003e;
+        public static final int sub_scoreboard_background=0x7f080045;
         /**  177efe 
          */
-        public static final int sub_scoreboard_text_color=0x7f08003f;
+        public static final int sub_scoreboard_text_color=0x7f080046;
         public static final int sub_text_color=0x7f080028;
         public static final int tab_background_color=0x7f08001a;
         /**  previously 3366dd 
@@ -123,7 +123,14 @@ custom color for pressed state
         /**  d42931 ae1d18 CD96CD DB70DB 024bc4 137ccd 64908A 
          */
         public static final int tray_background=0x7f080002;
-        public static final int word_list_area_background=0x7f08003d;
+        public static final int word_list_area_background=0x7f080044;
+        public static final int word_list_area_middle_border=0x7f08003d;
+        public static final int word_list_area_opponent_background=0x7f080042;
+        public static final int word_list_area_opponent_title_background=0x7f080041;
+        public static final int word_list_area_opponent_title_text=0x7f08003f;
+        public static final int word_list_area_player_background=0x7f080043;
+        public static final int word_list_area_player_title_background=0x7f080040;
+        public static final int word_list_area_player_title_text=0x7f08003e;
     }
     public static final class drawable {
         public static final int alert_background=0x7f020000;
@@ -280,26 +287,26 @@ custom color for pressed state
         public static final int alert_text=0x7f0b0010;
         public static final int alert_title=0x7f0b000e;
         public static final int alert_top=0x7f0b000c;
-        public static final int bCancel=0x7f0b008e;
+        public static final int bCancel=0x7f0b00a7;
         public static final int bHopperPeekPrice=0x7f0b00fe;
-        public static final int bLetter1=0x7f0b0094;
-        public static final int bLetter10=0x7f0b009e;
-        public static final int bLetter2=0x7f0b0095;
-        public static final int bLetter3=0x7f0b0096;
-        public static final int bLetter4=0x7f0b0097;
-        public static final int bLetter5=0x7f0b0098;
-        public static final int bLetter6=0x7f0b009a;
-        public static final int bLetter7=0x7f0b009b;
-        public static final int bLetter8=0x7f0b009c;
-        public static final int bLetter9=0x7f0b009d;
+        public static final int bLetter1=0x7f0b009a;
+        public static final int bLetter10=0x7f0b00a4;
+        public static final int bLetter2=0x7f0b009b;
+        public static final int bLetter3=0x7f0b009c;
+        public static final int bLetter4=0x7f0b009d;
+        public static final int bLetter5=0x7f0b009e;
+        public static final int bLetter6=0x7f0b00a0;
+        public static final int bLetter7=0x7f0b00a1;
+        public static final int bLetter8=0x7f0b00a2;
+        public static final int bLetter9=0x7f0b00a3;
         public static final int bNoAdsPrice=0x7f0b00ec;
         public static final int bNoThanks=0x7f0b0081;
         public static final int bOK=0x7f0b00d3;
-        public static final int bPlay=0x7f0b0091;
+        public static final int bPlay=0x7f0b00aa;
         public static final int bPremiumUpgradePrice=0x7f0b00e6;
-        public static final int bRecall=0x7f0b0090;
-        public static final int bShuffle=0x7f0b008f;
-        public static final int bStart=0x7f0b008d;
+        public static final int bRecall=0x7f0b00a9;
+        public static final int bShuffle=0x7f0b00a8;
+        public static final int bStart=0x7f0b00a6;
         public static final int bStore=0x7f0b0080;
         public static final int bWordDefinitionsPrice=0x7f0b00f2;
         public static final int bWordHintsPrice=0x7f0b00f8;
@@ -326,34 +333,34 @@ custom color for pressed state
         public static final int ivHopperPeekPurchased=0x7f0b00ff;
         public static final int ivNoAdsPurchased=0x7f0b00ed;
         public static final int ivOpponent=0x7f0b0014;
-        public static final int ivPlayedLetter1=0x7f0b00a1;
-        public static final int ivPlayedLetter10=0x7f0b00aa;
-        public static final int ivPlayedLetter2=0x7f0b00a2;
-        public static final int ivPlayedLetter3=0x7f0b00a3;
-        public static final int ivPlayedLetter4=0x7f0b00a4;
-        public static final int ivPlayedLetter5=0x7f0b00a5;
-        public static final int ivPlayedLetter6=0x7f0b00a6;
-        public static final int ivPlayedLetter7=0x7f0b00a7;
-        public static final int ivPlayedLetter8=0x7f0b00a8;
-        public static final int ivPlayedLetter9=0x7f0b00a9;
+        public static final int ivPlayedLetter1=0x7f0b008e;
+        public static final int ivPlayedLetter10=0x7f0b0097;
+        public static final int ivPlayedLetter2=0x7f0b008f;
+        public static final int ivPlayedLetter3=0x7f0b0090;
+        public static final int ivPlayedLetter4=0x7f0b0091;
+        public static final int ivPlayedLetter5=0x7f0b0092;
+        public static final int ivPlayedLetter6=0x7f0b0093;
+        public static final int ivPlayedLetter7=0x7f0b0094;
+        public static final int ivPlayedLetter8=0x7f0b0095;
+        public static final int ivPlayedLetter9=0x7f0b0096;
         public static final int ivPlayer=0x7f0b0075;
         public static final int ivPremiumUpgradePurchased=0x7f0b00e7;
         public static final int ivWordDefinitionsPurchased=0x7f0b00f3;
         public static final int ivWordHintsPurchased=0x7f0b00f9;
         public static final int ivWordnik=0x7f0b0079;
         public static final int llBottomBorder=0x7f0b0018;
-        public static final int llButtons=0x7f0b008c;
+        public static final int llButtons=0x7f0b00a5;
         public static final int llDefs=0x7f0b007d;
         public static final int llHints=0x7f0b0117;
         public static final int llHopperPeekPriceWrapper=0x7f0b00fd;
         public static final int llItem=0x7f0b0012;
-        public static final int llLetters1=0x7f0b0093;
-        public static final int llLetters2=0x7f0b0099;
+        public static final int llLetters1=0x7f0b0099;
+        public static final int llLetters2=0x7f0b009f;
         public static final int llNoAdsPriceWrapper=0x7f0b00eb;
         public static final int llOK=0x7f0b007e;
         public static final int llOpponentRecordWrapper=0x7f0b00cc;
         public static final int llOpponents=0x7f0b00ca;
-        public static final int llPlayedWord=0x7f0b00a0;
+        public static final int llPlayedWord=0x7f0b008d;
         public static final int llPremiumUpgradePriceWrapper=0x7f0b00e5;
         public static final int llWordDefinitionsPriceWrapper=0x7f0b00f1;
         public static final int llWordHintsPriceWrapper=0x7f0b00f7;
@@ -362,7 +369,7 @@ custom color for pressed state
         public static final int lookup_item_id=0x7f0b0082;
         public static final int lvGames=0x7f0b0019;
         public static final int lvOpponent=0x7f0b008a;
-        public static final int lvPlayer=0x7f0b008b;
+        public static final int lvPlayer=0x7f0b008c;
         public static final int lvWords=0x7f0b0074;
         public static final int options=0x7f0b00de;
         public static final int peek_description=0x7f0b00ad;
@@ -379,10 +386,9 @@ custom color for pressed state
         public static final int rlLetter5=0x7f0b0109;
         public static final int rlLetter6=0x7f0b010b;
         public static final int rlLetter7=0x7f0b010d;
-        public static final int rlLetters=0x7f0b0092;
+        public static final int rlLetters=0x7f0b0098;
         public static final int rlLineItem=0x7f0b00cb;
         public static final int rlNoAds=0x7f0b00e9;
-        public static final int rlPlayedWord=0x7f0b009f;
         public static final int rlPremiumUpgrade=0x7f0b00e3;
         public static final int rlWordDefinitions=0x7f0b00ef;
         public static final int rlWordHints=0x7f0b00f5;
@@ -524,6 +530,7 @@ custom color for pressed state
         public static final int tvOpponentWordListTitle=0x7f0b0089;
         public static final int tvPlayerName=0x7f0b00db;
         public static final int tvPlayerScore=0x7f0b00dc;
+        public static final int tvPlayerWordListTitle=0x7f0b008b;
         public static final int tvPoints=0x7f0b0119;
         public static final int tvPremiumUpgradeDescription=0x7f0b00e8;
         public static final int tvPremiumUpgradeTitle=0x7f0b00e4;
@@ -568,6 +575,18 @@ custom color for pressed state
         public static final int maxGameBoardTextHeight=0x7f090009;
         public static final int maxTrayTileSize=0x7f090006;
         public static final int minWordLength=0x7f09000a;
+        public static final int skillLevelAmateurMaxDelay=0x7f09000e;
+        public static final int skillLevelAmateurMinDelay=0x7f09000d;
+        public static final int skillLevelExpertMaxDelay=0x7f090014;
+        public static final int skillLevelExpertMinDelay=0x7f090013;
+        public static final int skillLevelMasterMaxDelay=0x7f090016;
+        public static final int skillLevelMasterMinDelay=0x7f090015;
+        public static final int skillLevelNoviceMaxDelay=0x7f09000c;
+        public static final int skillLevelNoviceMinDelay=0x7f09000b;
+        public static final int skillLevelProfessionalMaxDelay=0x7f090012;
+        public static final int skillLevelProfessionalMinDelay=0x7f090011;
+        public static final int skillLevelSemiProMaxDelay=0x7f090010;
+        public static final int skillLevelSemiProMinDelay=0x7f09000f;
     }
     public static final class layout {
         public static final int about=0x7f030000;
@@ -1045,6 +1064,7 @@ custom color for pressed state
         public static final int ContentAreaTextTopStyle=0x7f050008;
         public static final int ContentAreaTitleStyle=0x7f050009;
         public static final int ContentAreaTopStyle=0x7f05000a;
+        public static final int CountdownTextStyle=0x7f050060;
         public static final int CustomProgressStyle=0x7f05000c;
         public static final int DialogInnerStyle=0x7f05000d;
         public static final int DialogStyle=0x7f05000e;
@@ -1071,7 +1091,7 @@ custom color for pressed state
         public static final int LayoutStyle=0x7f050025;
         public static final int LayoutStyleThin=0x7f050022;
         public static final int LayoutThinStyle=0x7f050023;
-        public static final int LetterButtonAreaStyle=0x7f050060;
+        public static final int LetterButtonAreaStyle=0x7f050061;
         public static final int LetterValueStyle=0x7f050026;
         public static final int MainLandingButtonStyle=0x7f050027;
         public static final int MainScrollStyle=0x7f050028;
@@ -1107,6 +1127,8 @@ custom color for pressed state
         public static final int StoreItemPriceButtonStyle=0x7f050046;
         public static final int StoreItemPriceWrapperStyle=0x7f050047;
         public static final int StoreItemTitleStyle=0x7f050048;
+        public static final int SubScoreboardAreaStyle=0x7f050062;
+        public static final int SubScoreboardLogoStyle=0x7f050063;
         public static final int SubTextStyle=0x7f05004b;
         public static final int SwapDialogInnerStyle=0x7f05004c;
         public static final int SwapDialogStyle=0x7f05004d;

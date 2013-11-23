@@ -182,15 +182,15 @@ public final class R {
 		public static final int alert_text = 0x7f0b0010;
 		public static final int alert_title = 0x7f0b000e;
 		public static final int alert_top = 0x7f0b000c;
-		public static final int bCancel = 0x7f0b008e;
+		public static final int bCancel = 0x7f0b00a7;
 		public static final int bHopperPeekPrice = 0x7f0b00fe;
 		public static final int bNoAdsPrice = 0x7f0b00ec;
 		public static final int bNoThanks = 0x7f0b0081;
 		public static final int bOK = 0x7f0b00d3;
-		public static final int bPlay = 0x7f0b0091;
+		public static final int bPlay = 0x7f0b00aa;
 		public static final int bPremiumUpgradePrice = 0x7f0b00e6;
-		public static final int bRecall = 0x7f0b0090;
-		public static final int bShuffle = 0x7f0b008f;
+		public static final int bRecall = 0x7f0b00a9;
+		public static final int bShuffle = 0x7f0b00a8;
 		public static final int bStore = 0x7f0b0080;
 		public static final int bWordDefinitionsPrice = 0x7f0b00f2;
 		public static final int bWordHintsPrice = 0x7f0b00f8;
@@ -223,7 +223,7 @@ public final class R {
 		public static final int ivWordHintsPurchased = 0x7f0b00f9;
 		public static final int ivWordnik = 0x7f0b0079;
 		public static final int llBottomBorder = 0x7f0b0018;
-		public static final int llButtons = 0x7f0b008c;
+		public static final int llButtons = 0x7f0b00a5;
 		public static final int llDefs = 0x7f0b007d;
 		public static final int llHints = 0x7f0b0117;
 		public static final int llHopperPeekPriceWrapper = 0x7f0b00fd;
@@ -254,7 +254,7 @@ public final class R {
 		public static final int rlLetter5 = 0x7f0b0109;
 		public static final int rlLetter6 = 0x7f0b010b;
 		public static final int rlLetter7 = 0x7f0b010d;
-		public static final int rlLetters = 0x7f0b0092;
+		public static final int rlLetters = 0x7f0b0098;
 		public static final int rlLineItem = 0x7f0b00cb;
 		public static final int rlNoAds = 0x7f0b00e9;
 		public static final int rlPremiumUpgrade = 0x7f0b00e3;

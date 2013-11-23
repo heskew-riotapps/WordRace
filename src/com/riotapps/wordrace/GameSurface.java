@@ -2,9 +2,11 @@ package com.riotapps.wordrace;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TimerTask;
 import java.util.TreeSet;
 
 import com.chartboost.sdk.Chartboost;
@@ -13,37 +15,28 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
 import com.riotapps.wordrace.R;
 import com.riotapps.wordrace.hooks.GameService;
-import com.riotapps.wordbase.GameHistory;
 import com.riotapps.wordbase.hooks.AlphabetService;
-import com.riotapps.wordbase.hooks.Opponent;
 import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.Player;
-import com.riotapps.wordbase.hooks.PlayerService;
 import com.riotapps.wordbase.hooks.StoreService;
 import com.riotapps.wordbase.hooks.WordService;
 import com.riotapps.wordbase.interfaces.ICloseDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
 import com.riotapps.wordbase.ui.CustomProgressDialog;
 import com.riotapps.wordbase.ui.CustomToast;
-import com.riotapps.wordbase.ui.DialogManager;
-import com.riotapps.wordbase.ui.GameSurfaceView;
 import com.riotapps.wordbase.ui.MenuUtils;
 import com.riotapps.wordbase.utils.ApplicationContext;
 import com.riotapps.wordbase.utils.Constants;
 import com.riotapps.wordbase.utils.ImageHelper;
 import com.riotapps.wordbase.utils.Logger;
-import com.riotapps.wordbase.utils.PreconditionException;
 import com.riotapps.wordbase.utils.Utils;
 import com.riotapps.wordrace.hooks.Game;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
@@ -52,15 +45,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class GameSurface  extends FragmentActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, ICloseDialog{
@@ -85,6 +74,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private ListView lvOpponent;
 	 private ListView lvPlayer;
 	 private PlayedWordAdapter playerListadapter;
+	 private PlayedWordAdapter opponentListadapter;
  
 	private	LayoutInflater inflater;
 
@@ -93,6 +83,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	private PreLoadTask preloadTask = null;
 	private int letterTileSize;
 	private int playedLetterTileSize;
+	private AutoPlayTask autoPlayTask;
 	
 	private SortedSet<String> wordsPlayedByOpponent = new TreeSet<String>();
 	private SortedSet<String> wordsPlayedByPlayer = new TreeSet<String>();
@@ -1054,10 +1045,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 				    wordService = null;
 				      
 					//save game to save the total number of possibilities
-					 if (GameSurface.this.game.getNumPossibleWords() == 0){
+					// if (GameSurface.this.game.getNumPossibleWords() == 0){
 						 GameSurface.this.game.setNumPossibleWords(GameSurface.this.possibleWords.size());
 						 GameService.saveGame(GameSurface.this.game);
-					 }
+			//	GameSurface.this.autoPlay();
+						 
+					// }
 	    	 
 	    	 return null;
 
@@ -1067,15 +1060,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	   //      setProgressPercent(progress[0]);
 	   //  }
 	     protected void onPostExecute(Void param) {
-	    	 if (GameSurface.this.game.isActive()){
+	    //	 if (GameSurface.this.game.isActive()){
 	    		 TextView tvWordsLeft = (TextView)GameSurface.this.findViewById(com.riotapps.wordrace.R.id.tvWordsLeft); 
-		    	 if (GameSurface.this.game.getHopper().size() == 1){
-			 		 tvWordsLeft.setText(com.riotapps.wordrace.R.string.scoreboard_1_word_left); 
-				 }
-				 else{
+		  
 					 tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), GameSurface.this.game.getNumPossibleWords() - GameSurface.this.game.getPlayedWords().size()));
-				 }
-	    	 }
+			 
+	    	// }
 	    	 if (GameSurface.this.spinner != null){
 	    		 GameSurface.this.spinner.dismiss();
 	    		 GameSurface.this.spinner = null;
@@ -1085,6 +1075,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 
 	 }
 	 
+	private void autoPlay(){
+		this.autoPlayTask =  new AutoPlayTask();
+		this.autoPlayTask.execute();
+	}
 	
     private void dismissCustomDialog(){
 		if (this.customDialog != null){
@@ -1142,6 +1136,312 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		
 	}
 
+	private class AutoPlayTask extends AsyncTask<Void, PlayedWord, Void> {
+		  
+		private List<OpponentWord> words = new ArrayList<OpponentWord>();
+//		private Timer timer;
+		 @Override
+		 protected Void doInBackground(Void... params) {
+			// if (GameSurface.this.game.isActive()){
+			 
+			 //first fill the list
+			 for (String word : GameSurface.this.possibleWords){
+				words.add(new OpponentWord(word.toUpperCase(), GameSurface.this.calculatePoints(word.toUpperCase()))); 
+			 }
+		
+			 Collections.sort(words, new OpponentWordComparator());
+			 
+			//this.timer = new Timer();
+			
+			int minDelay = 1;
+			int maxDelay = 1;
+			
+			switch (GameSurface.this.game.getOpponent().getSkillLevel()){
+				case Constants.SKILL_LEVEL_NOVICE:
+					minDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelNoviceMinDelay);
+					maxDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelNoviceMaxDelay);
+					break;
+				case Constants.SKILL_LEVEL_AMATEUR:
+					minDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelAmateurMinDelay);
+					maxDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelAmateurMaxDelay);
+					break;
+				case Constants.SKILL_LEVEL_SEMI_PRO:
+					minDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelSemiProMinDelay);
+					maxDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelSemiProMaxDelay);
+					break;
+				case Constants.SKILL_LEVEL_PROFESSIONAL:
+					minDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelProfessionalMinDelay);
+					maxDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelProfessionalMaxDelay);
+					break;
+				case Constants.SKILL_LEVEL_EXPERT:
+					minDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelExpertMinDelay);
+					maxDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelExpertMaxDelay);
+					break;
+				case Constants.SKILL_LEVEL_MASTER:
+					minDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelMasterMinDelay);
+					maxDelay = GameSurface.this.getResources().getInteger(R.integer.skillLevelMasterMaxDelay);
+					break;
+			}
+
+			boolean play = true;
+			
+			//temp 
+			int x = 0;
+			
+			while (play){
+				if(!GameSurface.this.game.isStarted()) {
+					play = false;
+					break;
+				}
+				
+				x += 1;
+				
+				if (x >=20) {play=false;break;}
+				try {
+					Thread.sleep(Utils.getRandomNumberFromRange(minDelay, maxDelay));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				//in case game ends before thread if completed
+				if(!GameSurface.this.game.isStarted()) {
+					play = false;
+					break;
+				}
+				
+				int numOptions = words.size();
+				int randomIndex = 0;
+				int start = 0;
+				int base = 1;
+				int randomBetterPlay = 0;
+				
+ 
+				if (numOptions > 9){
+					
+					switch (game.getOpponent().getSkillLevel()){
+						case Constants.SKILL_LEVEL_NOVICE:
+							//from bottom 50%
+							base = Math.round(numOptions * .6f);//Math.round(numOptions / 2);
+							
+							start = 0;
+							//with a coin flip, determine if we grab from top half of range only
+							if (Utils.coinFlip() == Constants.COIN_FLIP_HEADS){
+								start = Math.round(base / 2); 
+							}
+							
+							//every so often (1 in 50 chance) let novice get lucky and play a better word from upper half
+							randomBetterPlay = Utils.getRandomNumberFromRange(1, 50);  //make these constants
+							if (randomBetterPlay == 7){
+								//grab from top 50%
+								start = base;
+								base = numOptions - 1;
+							}
+							
+							randomIndex = Utils.getRandomNumberFromRange(start, numOptions - base);
+							break;
+						case Constants.SKILL_LEVEL_AMATEUR:
+							//from 25% to 75%
+							//start = Math.round(numOptions / 4);
+							//base = numOptions - start;
+							start = 0;
+							base = Math.round(numOptions / 2); //numOptions - Math.round(numOptions / 4);
+							
+							//with a coin flip, determine if we grab from top half of range only
+							if (Utils.coinFlip() == Constants.COIN_FLIP_HEADS){
+								start = Math.round(base / 4); 
+							}
+							
+							//every so often (1 in 30 chance) let amateur get lucky and play a better word from upper half
+							randomBetterPlay = Utils.getRandomNumberFromRange(1, 30);  //make these constants
+							if (randomBetterPlay == 7){
+								//grab from top 75%
+								start = base;
+								base = numOptions - 1;
+							}
+							
+							randomIndex = Utils.getRandomNumberFromRange(start, base);					
+							break;
+						case Constants.SKILL_LEVEL_SEMI_PRO:
+							//from 50% to 90%
+							start = 0; //Math.round(numOptions / 2);
+							base = Math.round(numOptions * .4F); //Math.round(numOptions / 10);
+							
+							//if semi=pro opponent is losing, pull a word from upper part of his range
+							//if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 20){
+							//	//from 75% to 90%
+							//	start = numOptions - Math.round(numOptions / 4); 
+							//	//Logger.d(TAG, "autoplay SKILL_LEVEL_SEMI_PRO losing...start=" + start + " end=" + (numOptions - base));
+							//	
+							//}
+							//every so often (1 in 15 chance) let semi-pro get lucky and play a better word  
+							randomBetterPlay = Utils.getRandomNumberFromRange(1, 15);  //make these constants
+							if (randomBetterPlay == 7){
+								//grab from top 90%
+								start = numOptions - base;
+								base = 1;
+							}
+							randomIndex = Utils.getRandomNumberFromRange(start, numOptions - base);					
+							break;
+						case Constants.SKILL_LEVEL_PROFESSIONAL:
+							//first 75% unless losing by 100
+							base = Math.round(numOptions / 4); 
+							start = 0;
+							
+							//if opponent is losing by 100 or more, play from the top 5% 
+							//if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 20){
+							//	base = Math.round(numOptions / 20); 
+//							//	Logger.d(TAG, "autoplay SKILL_LEVEL_PROFESSIONAL losing...start=" + (numOptions - base) + " end=" + (numOptions - 1));
+//							//	
+							//}
+
+							//randomIndex = Utils.getRandomNumberFromRange(numOptions - base, numOptions - 1);
+							randomIndex = Utils.getRandomNumberFromRange(start, numOptions - base);
+							
+							break;
+						case Constants.SKILL_LEVEL_EXPERT:
+							//top 20% (or top 10%) unless losing by 80
+							
+							base = Math.round(numOptions / 5); 
+							start = 0;	
+							if (Utils.coinFlip() == Constants.COIN_FLIP_HEADS){
+								base = Math.round(numOptions / 10); 
+							}
+
+							randomIndex = Utils.getRandomNumberFromRange(numOptions - base, numOptions - 1);
+							
+							//if opponent is losing by 100 or more, play the highest score or second highest score 
+							//if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 20){
+	 						//	randomIndex = (Utils.coinFlip() == Constants.COIN_FLIP_HEADS ? numOptions - 1 : numOptions - 2);
+							//}
+							break;
+						case Constants.SKILL_LEVEL_MASTER:
+							base = Math.round(numOptions / 4); 
+							start = 0;
+							//if opponent is losing by 100 or more, play from the top 5% 
+							if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 20){
+								start = numOptions - Math.round(numOptions / 20); 
+//								Logger.d(TAG, "autoplay SKILL_LEVEL_PROFESSIONAL losing...start=" + (numOptions - base) + " end=" + (numOptions - 1));
+//								
+							}
+
+							randomIndex = Utils.getRandomNumberFromRange(start, numOptions - 1);
+							
+							//grab from top 2 choices with a coin toss
+							 
+ 						//	randomIndex = (Utils.coinFlip() == Constants.COIN_FLIP_HEADS ? numOptions - 1 : numOptions - 2);
+ 							
+ 							//if opponent is losing, play the highest score  
+						//	if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 10){
+						//		randomIndex = numOptions - 1;
+						//	}
+							break;
+					}
+				}
+				else if (numOptions == 1){
+					randomIndex = 0;
+				}
+				else {
+					//can tighten this into skill levels later if needed
+					randomIndex = Utils.getRandomNumberFromRange(0, numOptions - 1);
+				}
+			
+				if(!GameSurface.this.game.isStarted()) {
+					play = false;
+					break;
+				}
+				
+				OpponentWord chosenWord = words.get(randomIndex);
+				
+				PlayedWord playedWord = new PlayedWord();
+				playedWord.setPlayedDate(new Date());
+				playedWord.setOpponentPlay(true);
+				playedWord.setPointsScored(chosenWord.getPoints());
+				playedWord.setWord(chosenWord.getWord().toUpperCase());
+				
+				this.publishProgress(playedWord);
+				
+			}
+			/*
+			OpponentPlayTask task = new OpponentPlayTask();
+			this.timer.scheduleAtFixedRate(task, delay, interval);
+	    	 //}
+	    	  
+	    	  */
+	    	 return null;
+
+	     }
+			 	 
+
+		    protected void onProgressUpdate(PlayedWord... playedWord) {
+		    	//make sure that game.PlayedWord does not already contain word
+		  
+				if (GameSurface.this.wordsPlayedByOpponent.contains(playedWord[0].getWord())){
+	 				return;
+			 	}
+				
+				if (GameSurface.this.wordsPlayedByPlayer.contains(playedWord[0].getWord())){
+	 				return;
+			 	}
+		    	
+				GameSurface.this.wordsPlayedByOpponent.add(playedWord[0].getWord());
+		    	GameSurface.this.wordListPlayedByOpponent.add(playedWord[0]);
+				//this.llPlayerWords.addView(this.getPlayedWordView(playedWord));
+		    	GameSurface.this.opponentListadapter.notifyDataSetChanged();
+		    	GameSurface.this.lvOpponent.setSelection(GameSurface.this.opponentListadapter.getCount() - 1);
+		    	GameSurface.this.game.getPlayedWords().add(playedWord[0]);
+		    	GameSurface.this.game.setOpponentScore(GameSurface.this.game.getOpponentScore() + playedWord[0].getPointsScored());
+				
+		    	GameSurface.this.tvOpponentScore.setText(String.valueOf(GameSurface.this.game.getOpponentScore()));
+			 	
+		    	GameSurface.this.tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - GameSurface.this.game.getPlayedWords().size()));
+
+		    	
+		    }
+		    
+		 
+		private class OpponentWord {
+			private String word;
+			private int points;
+			
+			public OpponentWord(String word, int points){
+				this.word = word;
+				this.points = points;
+			}
+			
+			public String getWord() {
+				return word;
+			}
+			public void setWord(String word) {
+				this.word = word;
+			}
+			public int getPoints() {
+				return points;
+			}
+			public void setPoints(int points) {
+				this.points = points;
+			}
+		
+		}
+		
+		private class OpponentWordComparator implements Comparator<OpponentWord> {
+
+			@Override
+			public int compare(OpponentWord r1, OpponentWord r2) {
+				return ((Integer)r1.getPoints()).compareTo((Integer)r2.getPoints());
+			}
+		}
+		
+	    protected void onPostExecute(Void param) {
+	    	  
+	    	 //do something
+	    	  
+	     }
+
+	 
+	 }
+	
+	
     private void setupMenu(){
       	
 	  	  this.popupMenu = new PopupMenu(this, findViewById(R.id.options));
@@ -1257,7 +1557,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		
 	}
 	private void updatePointsView(){
-		int points = this.calculatePoints();
+		int points = this.calculatePoints(this.currentWord);
 		
 		if (points > 0){
  			tvNumPoints.setText(String.format(this.getString(R.string.scoreboard_num_points),points));
@@ -1268,16 +1568,32 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		}
 	}
 	
-	
-	private int calculatePoints(){
+	private int calculatePoints(String word){
+		//split word into list of letters
+		List<String> letters = new ArrayList<String>();
 		
-		if (this.currentWord.size() < 3){ return 0; }
+		String[] letterArray = word.trim().split("");
+		//because java adds empty string as the first element, its a bit annoying
+		//use 1 to get the first  element  
+		for (String letter : letterArray ){
+			if (letter.length() > 0){
+				letters.add(letter);
+			}
+		}
+		
+		return calculatePoints(letters);
+	}
+	
+	
+	private int calculatePoints(List<String> letters){
+		
+		if (letters.size() < 3){ return 0; }
 		
 		String word = "";
 		
 		int points = 0;
 		
-		for (String letter : this.currentWord){
+		for (String letter : letters){
 			points += AlphabetService.getLetterValue(letter);
 			word += letter;
 		}
@@ -1285,16 +1601,16 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		//if not a valid word no points are calculated
 		if (!this.possibleWords.contains(word.toLowerCase())) { return 0; }
 		
-		if (this.currentWord.size() == 10){
-			points += 30; ///make this a constant on int resource
+		if (letters.size() == 10){
+			points += 15; //30; ///make this a constant on int resource
 		}
-		else if (this.currentWord.size() >= 8){
+	/*	else if (letters.size() >= 8){
 			points += 15;
 		}
-		else if (this.currentWord.size() >= 6){
+		else if (letters.size() >= 6){
 			points += 5;
 		}
-		
+		*/
 		return points;
 	}
 	
@@ -1327,13 +1643,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			new CustomToast(this, String.format(this.getString(R.string.game_surface_race_word_invalid), word)).show();
 			return;
 	 	}
-		int points = this.calculatePoints();
+		int points = this.calculatePoints(this.currentWord);
 		
 		this.handleRecall();
 		this.wordsPlayedByPlayer.add(word);
 		 
 		
-		final PlayedWord playedWord = new PlayedWord();
+		PlayedWord playedWord = new PlayedWord();
 		playedWord.setPlayedDate(new Date());
 		playedWord.setOpponentPlay(false);
 		playedWord.setPointsScored(points);
@@ -1374,8 +1690,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	private void initializePlayerWordLists(){
 
 	 	this.playerListadapter = new PlayedWordAdapter(this, this.wordListPlayedByPlayer);
-
 		this.lvPlayer.setAdapter(this.playerListadapter); 
+		
+	 	this.opponentListadapter = new PlayedWordAdapter(this, this.wordListPlayedByOpponent);
+		this.lvOpponent.setAdapter(this.opponentListadapter); 
 	 
 	}
 	
@@ -1748,6 +2066,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	   }
 	   
 	   private void handleStartOnClick(){
+		   this.handleStartOK();
+		   /*
 	    	this.customDialog = new CustomButtonDialog(this, 
 	    			this.getString(R.string.game_surface_start_game_confirmation_title), 
 	    			this.getString(R.string.game_surface_start_game_confirmation_text),
@@ -1758,7 +2078,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					Constants.RETURN_CODE_CUSTOM_DIALOG_START_CLOSE_CLICKED);
 	    
 	    	this.customDialog.show();	
-
+		*/
    	   }
 
 	   private void handleCancelOK(){
@@ -1776,8 +2096,15 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		   this.loadButtons();
 			
 		   //might need a start delay here at some point
+		   int timerLength = 180000; //3minutes
+		   if (this.game.isDoubleTimeType()){
+			   timerLength = 360000;
+		   }
+		   else if(this.game.isSpeedRoundType()){
+			   timerLength = 60000;
+		   }
 		   
-		   this.countdown = new CountDownTimer(180000, 1000) {
+		   this.countdown = new CountDownTimer(timerLength, 1000) {
 
 			     public void onTick(long millisUntilFinished) {
 			    	 int secondsUntilFinished = (int) millisUntilFinished / 1000;
@@ -1787,17 +2114,37 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			         GameSurface.this.tvCountdown.setText(String.format(GameSurface.this.getString(R.string.scoreboard_countdown), minutesLeft, String.format("%02d", secondsLeft)));
 			     }
 
+			     
 			     public void onFinish() {
 			        // mTextField.setText("done!");
 			    	 GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
+			
+			    	 if (GameSurface.this.game.isSpeedRoundType()){
+			    		GameSurface.this.handleRound(2); 
+			    	 }
+			    	 else{
+			    		 GameService.completeGame(GameSurface.this.game);
+			    	 }
 			     }
 			  };
 			  
+			  
 			  this.countdown.start();
 	 		 
-
+			  this.autoPlay();
+				
 	   }
 	   
+	   private void handleRound(int round){
+		   //show spinner
+		   //update  tray
+		   //update possible words
+		   //update UI
+		   //update game round
+		   this.game.setRound(round);
+		   //kick off game again
+	   }
+ 	   
 		private void setupChartBoost(){
 			this.cb = Chartboost.sharedChartboost();
 			this.cb.onCreate(this, this.getString(R.string.chartboost_app_id), this.getString(R.string.chartboost_app_signature), this.chartBoostDelegate);
@@ -2151,12 +2498,16 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			Button bCancel = (Button) findViewById(R.id.bCancel);
 			Button bRecall = (Button) findViewById(R.id.bRecall);
 			Button bStart = (Button) findViewById(R.id.bStart);
+			TextView tvOpponentWordListTitle = (TextView)findViewById(R.id.tvOpponentWordListTitle);
+			TextView tvPlayerWordListTitle = (TextView)findViewById(R.id.tvPlayerWordListTitle);
 
 			bShuffle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bPlay.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bCancel.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bRecall.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bStart.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			tvOpponentWordListTitle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			tvPlayerWordListTitle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 		}
 		
 		private class PlayedWordAdapter extends ArrayAdapter<PlayedWord> {
@@ -2188,10 +2539,14 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			    	   PlayedWord word = values.get(position);
 			    	 
 			    	   TextView tvWord = (TextView) rowView.findViewById(R.id.tvWord);
-			     	   
+			    	   TextView tvPoints = (TextView) rowView.findViewById(R.id.tvPoints);
+
+			    	   
 			    	   tvWord.setTypeface(ApplicationContext.getScoreboardFontTypeface());
+			    	   tvPoints.setTypeface(ApplicationContext.getScoreboardFontTypeface());
  
 			    	   tvWord.setText(word.getWord());
+			    	   tvPoints.setText(String.valueOf(word.getPointsScored()));
 		 	     	   
 			    	   rowView.setTag(word.getWord());
 			    	   return rowView;

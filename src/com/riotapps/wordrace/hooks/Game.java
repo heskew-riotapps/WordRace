@@ -46,6 +46,9 @@ public class Game {
 	@SerializedName("g_t")
 	private int gameType = 0;
 
+	@SerializedName("r")
+	private int round = 1;
+
 	public Opponent getOpponent(){
 		return OpponentService.getOpponent(this.opponentId);
 	}
@@ -152,4 +155,12 @@ public class Game {
 	{
 		return this.gameType == 2;
 	}
+	public int getRound() {
+		return round;
+	}
+	public void setRound(int round) {
+		this.round = round;
+	}
+	
+	
 }
