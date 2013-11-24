@@ -3,17 +3,17 @@
  	<integer name="gameBoardLogoHeightPercentageInTenths">9</integer>
  	<integer name="maxGameBoardLogoHeight">80</integer>
  	<integer name="minWordLength">3</integer>
- 	<integer name="skillLevelNoviceMinDelay">3000</integer>
- 	<integer name="skillLevelNoviceMaxDelay">15000</integer>
- 	<integer name="skillLevelAmateurMinDelay">2500</integer>
- 	<integer name="skillLevelAmateurMaxDelay">14000</integer>
- 	<integer name="skillLevelSemiProMinDelay">2000</integer>
- 	<integer name="skillLevelSemiProMaxDelay">13000</integer>
- 	<integer name="skillLevelProfessionalMinDelay">1500</integer>
- 	<integer name="skillLevelProfessionalMaxDelay">12000</integer>
- 	<integer name="skillLevelExpertMinDelay">1100</integer>
- 	<integer name="skillLevelExpertMaxDelay">11000</integer>
- 	<integer name="skillLevelMasterMinDelay">1000</integer>
- 	<integer name="skillLevelMasterMaxDelay">10000</integer>
+ 	<integer name="skillLevelNoviceMinDelay">2000</integer>
+ 	<integer name="skillLevelNoviceMaxDelay">11000</integer>
+ 	<integer name="skillLevelAmateurMinDelay">1800</integer>
+ 	<integer name="skillLevelAmateurMaxDelay">10000</integer>
+ 	<integer name="skillLevelSemiProMinDelay">1500</integer>
+ 	<integer name="skillLevelSemiProMaxDelay">9000</integer>
+ 	<integer name="skillLevelProfessionalMinDelay">1100</integer>
+ 	<integer name="skillLevelProfessionalMaxDelay">8000</integer>
+ 	<integer name="skillLevelExpertMinDelay">1000</integer>
+ 	<integer name="skillLevelExpertMaxDelay">7000</integer>
+ 	<integer name="skillLevelMasterMinDelay">800</integer>
+ 	<integer name="skillLevelMasterMaxDelay">6000</integer>
  	
 </resources>

@@ -1,5 +1,7 @@
 package com.riotapps.wordrace;
 
+import com.riotapps.wordrace.hooks.GameService;
+
 import android.os.Bundle;
 
 public class GameLookup extends com.riotapps.wordbase.GameLookup {
@@ -10,4 +12,9 @@ public class GameLookup extends com.riotapps.wordbase.GameLookup {
 		super.onCreate(savedInstanceState);
 	}
 
+	@Override
+	protected void loadGame(String gameId){
+		 GameService.loadScoreboard(this, GameService.getGame(gameId));
+	}
+	
 }

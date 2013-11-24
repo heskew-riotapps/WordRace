@@ -11,10 +11,13 @@ import java.util.TreeSet;
 
 import com.chartboost.sdk.Chartboost;
 import com.chartboost.sdk.ChartboostDelegate;
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
 import com.riotapps.wordrace.R;
 import com.riotapps.wordrace.hooks.GameService;
+import com.riotapps.wordbase.GameHistory;
 import com.riotapps.wordbase.hooks.AlphabetService;
 import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.Player;
@@ -24,10 +27,12 @@ import com.riotapps.wordbase.interfaces.ICloseDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
 import com.riotapps.wordbase.ui.CustomProgressDialog;
 import com.riotapps.wordbase.ui.CustomToast;
+import com.riotapps.wordbase.ui.GameStateService;
 import com.riotapps.wordbase.ui.MenuUtils;
 import com.riotapps.wordbase.utils.ApplicationContext;
 import com.riotapps.wordbase.utils.Constants;
 import com.riotapps.wordbase.utils.ImageHelper;
+import com.riotapps.wordbase.utils.IntentExtra;
 import com.riotapps.wordbase.utils.Logger;
 import com.riotapps.wordbase.utils.Utils;
 import com.riotapps.wordrace.hooks.Game;
@@ -45,12 +50,15 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class GameSurface  extends FragmentActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, ICloseDialog{
 	private static final String TAG = GameSurface.class.getSimpleName();
@@ -68,6 +76,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private CountDownTimer countdown = null;
 	 private TextView tvCountdown;
 	 private TextView tvNumPoints;
+	 private TextView tvWinner;
+	 private TextView tvLookupDefinitions;
 	 private TextView tvWordsLeft;
 	 private TextView tvOpponentScore;
 	 private TextView tvPlayerScore;
@@ -75,6 +85,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private ListView lvPlayer;
 	 private PlayedWordAdapter playerListadapter;
 	 private PlayedWordAdapter opponentListadapter;
+	 private boolean isCompletedThisSession = false;
+	 private LinearLayout llButtons;
+	 private LinearLayout llAdWrapper;
+	 private List<OpponentWord> opponentWords = new ArrayList<OpponentWord>();
  
 	private	LayoutInflater inflater;
 
@@ -566,9 +580,71 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	this.setupGame();
 	 	this.loadLetterViews();
 	 	this.loadButtons();
-	 	this.initializePlayerWordLists();
+	 	this.initializeWordLists();
+	 	this.setCompletedState();
 	}
 	 
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		//super.onBackPressed();
+		//override back button in case user just started game. this will make sure they don;t back through 
+		//all of the pick opponent activities
+ 
+		if (this.isChartBoostActive && this.cb.onBackPressed())
+			// If a Chartboost view exists, close it and return
+			return;
+		else if (this.game.isCompleted() && !this.isCompletedThisSession){
+			//if game is completed, just go back to whatever activity is in the stack
+			 
+			this.game = null;
+			this.player = null;
+
+			super.onBackPressed();
+		}
+		else {
+			this.handleBack();
+		}
+	}
+	
+	private void handleBack(){
+		boolean backToMain = false;
+		if (this.game.isCompleted()) {
+			backToMain = true;
+		}
+		else {
+			GameService.saveGame(this.game);
+		}
+		//disable back if started??? or just come back to proper state?
+		
+		if (this.autoPlayTask != null){
+    		this.autoPlayTask = null;
+    	}
+		
+		if (this.preloadTask != null){
+			this.preloadTask = null;
+		}
+		
+		this.game = null;
+		this.player = null;
+		
+		if (backToMain){
+			//in this case the game was completed in this session so lets just send player to main activity
+			((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_MAIN);
+
+			//Intent intent = new Intent(this, com.riotapps.wordbase.Main.class);
+    		//this.startActivity(intent); 
+    		this.finish();
+		}	
+		else{
+			Intent startMain = new Intent(Intent.ACTION_MAIN);
+			startMain.addCategory(Intent.CATEGORY_HOME);
+			startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(startMain);
+			this.finish(); 	
+		}
+	
+}
 
 	private void loadButtons(){
 		Button bStart = (Button)this.findViewById(R.id.bStart);
@@ -576,12 +652,16 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		Button bShuffle = (Button)this.findViewById(R.id.bShuffle);
 		Button bRecall = (Button)this.findViewById(R.id.bRecall);
 		Button bPlay = (Button)this.findViewById(R.id.bPlay);
+		this.llAdWrapper = (LinearLayout)this.findViewById(R.id.llAdWrapper);
+		this.llButtons = (LinearLayout)this.findViewById(R.id.llButtons);
 		
 		bStart.setOnClickListener(this);
 		bCancel.setOnClickListener(this);
 		bShuffle.setOnClickListener(this);
 		bRecall.setOnClickListener(this);
 		bPlay.setOnClickListener(this);
+		
+		llAdWrapper.setVisibility(View.GONE);
 		
 		if (this.game.isStarted()){
 			bStart.setVisibility(View.GONE);
@@ -598,8 +678,70 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			bPlay.setVisibility(View.GONE);			
 		}
 		else{ ///completed
-		
+			bStart.setVisibility(View.GONE);
+			bCancel.setVisibility(View.GONE);
+			bShuffle.setVisibility(View.GONE);
+			bRecall.setVisibility(View.GONE);
+			bPlay.setVisibility(View.GONE);
+			
+			llButtons.setVisibility(View.GONE);
+			llAdWrapper.setVisibility(View.VISIBLE);
+			
+			AdView adView = (AdView)this.findViewById(R.id.adView);
+	    	if (StoreService.isHideBannerAdsPurchased(this)){	
+				adView.setVisibility(View.GONE);
+			}
+	    	else {
+	    		adView.loadAd(new AdRequest());
+	    	}
 		}
+	}
+	
+	private void setCompletedState(){
+		if (this.game.isCompleted()){
+			
+			this.ivPlayedLetter1.setVisibility(View.GONE);
+			this.ivPlayedLetter2.setVisibility(View.GONE);
+			this.ivPlayedLetter3.setVisibility(View.GONE);
+			this.ivPlayedLetter4.setVisibility(View.GONE);
+			this.ivPlayedLetter5.setVisibility(View.GONE);
+			this.ivPlayedLetter6.setVisibility(View.GONE);
+			this.ivPlayedLetter7.setVisibility(View.GONE);
+			this.ivPlayedLetter8.setVisibility(View.GONE);
+			this.ivPlayedLetter9.setVisibility(View.GONE);
+			this.ivPlayedLetter10.setVisibility(View.GONE);
+			
+			this.tvLookupDefinitions.setVisibility(View.VISIBLE);
+			this.tvWinner.setVisibility(View.VISIBLE);
+			
+			if (this.game.getOpponentScore() > this.game.getPlayerScore()){
+				this.tvWinner.setText(String.format(this.getString(R.string.game_surface_opponent_winner_message), this.game.getOpponent().getName()));
+			}
+			else if(this.game.getPlayerScore() > this.game.getOpponentScore()){
+				this.tvWinner.setText(this.getString(R.string.game_surface_player_winner_message));
+			}
+			else {
+				this.tvWinner.setText(this.getString(R.string.game_surface_draw_message));
+			}	 
+			
+			this.llButtons.setVisibility(View.GONE);
+			this.llAdWrapper.setVisibility(View.VISIBLE);
+			
+			AdView adView = (AdView)this.findViewById(R.id.adView);
+	    	if (StoreService.isHideBannerAdsPurchased(this)){	
+				adView.setVisibility(View.GONE);
+			}
+	    	else {
+	    		adView.loadAd(new AdRequest());
+	    	}
+			
+	    	this.initializeHopper();
+			this.initializeTray();
+			this.setListenerOnLists();
+		}
+	 
+		
+	 
 	}
 	
 	private void loadViews(){
@@ -607,12 +749,28 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
 		this.tvCountdown = (TextView)this.findViewById(R.id.tvCountdown);
 		this.tvNumPoints = (TextView)this.findViewById(R.id.tvNumPoints);
+		this.tvLookupDefinitions = (TextView)this.findViewById(R.id.tvLookupDefinitions);
+		this.tvWinner = (TextView)this.findViewById(R.id.tvWinner);
 		this.tvWordsLeft = (TextView)this.findViewById(R.id.tvWordsLeft);
 		this.tvOpponentScore = (TextView)this.findViewById(R.id.tvOpponentScore);
 		this.tvPlayerScore = (TextView)this.findViewById(R.id.tvPlayerScore);
 		this.lvOpponent = (ListView)this.findViewById(R.id.lvOpponent);
 		this.lvPlayer = (ListView)this.findViewById(R.id.lvPlayer);
+		
+		this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_start));
+		if (this.game.isSpeedRoundType()){
+			this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_spped_round_start));
+		}
+		else if (this.game.isDoubleTimeType()){
+			this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_double_time_start));
+		}
+		
+		TextView tvOpponentWordListTitle = (TextView)this.findViewById(R.id.tvOpponentWordListTitle);
+		tvOpponentWordListTitle.setText(String.format(this.getString(R.string.game_surface_opponents_words), this.game.getOpponent().getName()));
 		//this.llPlayerWords = (LinearLayout)this.findViewById(R.id.llPlayerWords);
+		
+		this.tvLookupDefinitions.setVisibility(View.GONE);
+		this.tvWinner.setVisibility(View.GONE);
 		
 		this.bLetter1 = (ImageView) findViewById(R.id.bLetter1);
 		this.bLetter2 = (ImageView) findViewById(R.id.bLetter2);
@@ -1043,6 +1201,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					letterSets = null;
 					wordService.finish();
 				    wordService = null;
+				    
+				    for (String word : GameSurface.this.possibleWords){
+				    	opponentWords.add(new OpponentWord(word.toUpperCase(), GameSurface.this.calculatePoints(word.toUpperCase()))); 
+					 }
+				
+					 Collections.sort(opponentWords, new OpponentWordComparator());
 				      
 					//save game to save the total number of possibilities
 					// if (GameSurface.this.game.getNumPossibleWords() == 0){
@@ -1138,18 +1302,18 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
 	private class AutoPlayTask extends AsyncTask<Void, PlayedWord, Void> {
 		  
-		private List<OpponentWord> words = new ArrayList<OpponentWord>();
+		//private List<OpponentWord> words = new ArrayList<OpponentWord>();
 //		private Timer timer;
 		 @Override
 		 protected Void doInBackground(Void... params) {
 			// if (GameSurface.this.game.isActive()){
 			 
 			 //first fill the list
-			 for (String word : GameSurface.this.possibleWords){
-				words.add(new OpponentWord(word.toUpperCase(), GameSurface.this.calculatePoints(word.toUpperCase()))); 
-			 }
+		//	 for (String word : GameSurface.this.possibleWords){
+		//		words.add(new OpponentWord(word.toUpperCase(), GameSurface.this.calculatePoints(word.toUpperCase()))); 
+		//	 }
 		
-			 Collections.sort(words, new OpponentWordComparator());
+		//	 Collections.sort(words, new OpponentWordComparator());
 			 
 			//this.timer = new Timer();
 			
@@ -1210,7 +1374,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					break;
 				}
 				
-				int numOptions = words.size();
+				int numOptions = opponentWords.size();
 				int randomIndex = 0;
 				int start = 0;
 				int base = 1;
@@ -1351,7 +1515,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					break;
 				}
 				
-				OpponentWord chosenWord = words.get(randomIndex);
+				OpponentWord chosenWord = opponentWords.get(randomIndex);
 				
 				PlayedWord playedWord = new PlayedWord();
 				playedWord.setPlayedDate(new Date());
@@ -1399,39 +1563,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		    	
 		    }
 		    
-		 
-		private class OpponentWord {
-			private String word;
-			private int points;
-			
-			public OpponentWord(String word, int points){
-				this.word = word;
-				this.points = points;
-			}
-			
-			public String getWord() {
-				return word;
-			}
-			public void setWord(String word) {
-				this.word = word;
-			}
-			public int getPoints() {
-				return points;
-			}
-			public void setPoints(int points) {
-				this.points = points;
-			}
-		
-		}
-		
-		private class OpponentWordComparator implements Comparator<OpponentWord> {
-
-			@Override
-			public int compare(OpponentWord r1, OpponentWord r2) {
-				return ((Integer)r1.getPoints()).compareTo((Integer)r2.getPoints());
-			}
-		}
-		
+	
 	    protected void onPostExecute(Void param) {
 	    	  
 	    	 //do something
@@ -1440,6 +1572,38 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
 	 
 	 }
+
+	public class OpponentWord {
+		private String word;
+		private int points;
+		
+		public OpponentWord(String word, int points){
+			this.word = word;
+			this.points = points;
+		}
+		
+		public String getWord() {
+			return word;
+		}
+		public void setWord(String word) {
+			this.word = word;
+		}
+		public int getPoints() {
+			return points;
+		}
+		public void setPoints(int points) {
+			this.points = points;
+		}
+	
+	}
+	
+	private class OpponentWordComparator implements Comparator<OpponentWord> {
+
+		@Override
+		public int compare(OpponentWord r1, OpponentWord r2) {
+			return ((Integer)r1.getPoints()).compareTo((Integer)r2.getPoints());
+		}
+	}
 	
 	
     private void setupMenu(){
@@ -1513,11 +1677,11 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		ivPlayedLetter3.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
 		ivPlayedLetter4.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
 		ivPlayedLetter5.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
-		ivPlayedLetter6.setImageBitmap(GameSurface.getPlayedEmpty_6(this, playedLetterTileSize));
+		ivPlayedLetter6.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
 		ivPlayedLetter7.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
-		ivPlayedLetter8.setImageBitmap(GameSurface.getPlayedEmpty_8(this, playedLetterTileSize));
+		ivPlayedLetter8.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
 		ivPlayedLetter9.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
-		ivPlayedLetter10.setImageBitmap(GameSurface.getPlayedEmpty_10(this, playedLetterTileSize));
+		ivPlayedLetter10.setImageBitmap(GameSurface.getPlayedEmpty(this, playedLetterTileSize));
 
 	}
 	
@@ -1601,9 +1765,9 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		//if not a valid word no points are calculated
 		if (!this.possibleWords.contains(word.toLowerCase())) { return 0; }
 		
-		if (letters.size() == 10){
-			points += 15; //30; ///make this a constant on int resource
-		}
+	//	if (letters.size() == 10){
+	//		points += 15; //30; ///make this a constant on int resource
+	//	}
 	/*	else if (letters.size() >= 8){
 			points += 15;
 		}
@@ -1687,15 +1851,64 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 
 
 	
-	private void initializePlayerWordLists(){
+	private void initializeWordLists(){
 
 	 	this.playerListadapter = new PlayedWordAdapter(this, this.wordListPlayedByPlayer);
 		this.lvPlayer.setAdapter(this.playerListadapter); 
 		
 	 	this.opponentListadapter = new PlayedWordAdapter(this, this.wordListPlayedByOpponent);
 		this.lvOpponent.setAdapter(this.opponentListadapter); 
-	 
+		
+		if (this.game.getPlayedWords().size() > 0){
+			//game is completed or underway, load up lists
+			for (PlayedWord word : this.game.getPlayedWords()){
+				if (word.isOpponentPlay()){
+					this.wordListPlayedByOpponent.add(word);
+					this.wordsPlayedByOpponent.add(word.getWord());
+				}
+				else {
+					this.wordListPlayedByPlayer.add(word);
+					this.wordsPlayedByPlayer.add(word.getWord());
+				}
+			}
+			
+			this.playerListadapter.notifyDataSetChanged();
+			this.opponentListadapter.notifyDataSetChanged();
+			
+		}
 	}
+	
+	private void setListenerOnLists(){
+		this.lvPlayer.setOnItemClickListener(new OnItemClickListener() {
+	        @Override
+	        public void onItemClick(AdapterView<?> parent, View view, int position,
+	                long id) {
+	        	
+	        	//this will eventually call wordnik for definition lookup
+	        	List<IntentExtra> extras = new ArrayList<IntentExtra>();
+	        	extras.add(new IntentExtra(Constants.EXTRA_GAME_ID, GameSurface.this.game.getId(), String.class));	
+	        	extras.add(new IntentExtra(Constants.EXTRA_WORD_LOOKUP, view.getTag().toString(), String.class));	
+				((ApplicationContext)GameSurface.this.getApplication()).startNewActivity(GameSurface.this, Constants.ACTIVITY_CLASS_GAME_LOOKUP, extras);
+
+	        }
+	    });
+
+		this.lvOpponent.setOnItemClickListener(new OnItemClickListener() {
+	        @Override
+	        public void onItemClick(AdapterView<?> parent, View view, int position,
+	                long id) {
+	        	
+	        	//this will eventually call wordnik for definition lookup
+	        	List<IntentExtra> extras = new ArrayList<IntentExtra>();
+	        	extras.add(new IntentExtra(Constants.EXTRA_GAME_ID, GameSurface.this.game.getId(), String.class));	
+	        	extras.add(new IntentExtra(Constants.EXTRA_WORD_LOOKUP, view.getTag().toString(), String.class));	
+				((ApplicationContext)GameSurface.this.getApplication()).startNewActivity(GameSurface.this, Constants.ACTIVITY_CLASS_GAME_LOOKUP, extras);
+
+	        }
+	    });
+	}
+	
+	
 	
 	private void handleShuffle(){
 		//only allow shuffle if all letters are in tray?
@@ -2096,12 +2309,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		   this.loadButtons();
 			
 		   //might need a start delay here at some point
-		   int timerLength = 180000; //3minutes
+		   int timerLength = 90000; //2 minutes
 		   if (this.game.isDoubleTimeType()){
-			   timerLength = 360000;
+			   timerLength = 180000;
 		   }
 		   else if(this.game.isSpeedRoundType()){
-			   timerLength = 60000;
+			   timerLength = 45000;
 		   }
 		   
 		   this.countdown = new CountDownTimer(timerLength, 1000) {
@@ -2123,7 +2336,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			    		GameSurface.this.handleRound(2); 
 			    	 }
 			    	 else{
-			    		 GameService.completeGame(GameSurface.this.game);
+			    		 GameSurface.this.handleCompletion();
 			    	 }
 			     }
 			  };
@@ -2135,6 +2348,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 				
 	   }
 	   
+	   private void handleCompletion(){
+		   this.isCompletedThisSession = true;
+		   GameService.completeGame(GameSurface.this.game);
+		   this.setCompletedState();
+	   }
+	   
+
 	   private void handleRound(int round){
 		   //show spinner
 		   //update  tray
@@ -2500,6 +2720,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			Button bStart = (Button) findViewById(R.id.bStart);
 			TextView tvOpponentWordListTitle = (TextView)findViewById(R.id.tvOpponentWordListTitle);
 			TextView tvPlayerWordListTitle = (TextView)findViewById(R.id.tvPlayerWordListTitle);
+			TextView tvWinner = (TextView)this.findViewById(R.id.tvWinner);
+			TextView tvWordsLeft = (TextView)this.findViewById(R.id.tvWordsLeft);
 
 			bShuffle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bPlay.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
@@ -2508,6 +2730,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			bStart.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			tvOpponentWordListTitle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			tvPlayerWordListTitle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			tvWinner.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			tvWordsLeft.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 		}
 		
 		private class PlayedWordAdapter extends ArrayAdapter<PlayedWord> {

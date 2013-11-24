@@ -19,7 +19,8 @@
     <color name="scoreboard_text_last_played_color">#FF0000</color> <!-- #FF0000 --> 
 	<color name="sub_scoreboard_background">#29cdf0</color><!-- 177efe -->
  <color name="sub_scoreboard_text_color">#ffffff</color>
- 
+ <color name="gameboard_winner_text">#ffffff</color>
+  <color name="gameboard_lookup_definition_text">#ffffff</color>
 	<color name="button_text_color_off">#790909</color>
 	<color name="game_board_full_view_upper_gap_bg">#cada39</color> <!-- #ffecaa eec591  -->
 	<color name="game_board_full_view_lower_gap_bg">#cada39</color> <!-- #ffecaa eec591  -->

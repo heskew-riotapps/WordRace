@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="GameboardLookupDefinitionTextStyle" >
+   		<item name="android:layout_marginRight">8dp</item>
+   		<item name="android:layout_alignParentRight">true</item>
+   	   	<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">40dp</item>
+ 		<item name="android:includeFontPadding">false</item>
+		<item name="android:gravity">center_vertical|right</item>   -
+		<item name="android:textColor">@color/gameboard_lookup_definition_text</item>
+		<item name="android:textSize">14sp</item>
+ 
+	</style>
+</resources>	   
+		    

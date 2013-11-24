@@ -117,7 +117,7 @@ public class Game {
 	}
 	
 	public boolean isCompleted(){
-		return this.status == 3 || this.getStatus() == 4;
+		return this.status == 3;
 	}
 	
 	public boolean isActive(){

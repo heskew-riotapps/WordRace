@@ -29,8 +29,8 @@
 	<string name="SKU_GOOGLE_PLAY_HOPPER_PEEK">riotapps_wwe_hopper_peek.a</string>
 	<string name="SKU_GOOGLE_PLAY_PREMIUM_UPGRADE">riotapps_wwe_premium_upgrade.a</string>
 	<string name="SKU_GOOGLE_PLAY_WORD_DEFINITIONS">riotapps_wwe_word_definitions.a</string>
-	<string name="SKU_GOOGLE_PLAY_HIDE_INTERSTITIAL">riotapps_wwe_hide_interstitial.a</string>
-	<string name="SKU_GOOGLE_PLAY_WORD_HINTS">riotapps_wwe_word_hints.a</string>
+	<string name="SKU_GOOGLE_PLAY_DOUBLE_TIME">riotapps_wwe_hide_interstitial.a</string>
+	<string name="SKU_GOOGLE_PLAY_SPEED_ROUNDS">riotapps_wwe_word_hints.a</string>
 	
 	<string name="main_first_time_alert_title">Welcome!</string>
 	<string name="main_first_time_alert_message">To get started, just choose a monster to play.  Check out all of the rules or visit the store by tapping the 3 squares in the top right corner.\n\nEnjoy Race With Enemies!\n\nThe monsters are waiting.</string>
@@ -147,7 +147,9 @@
 	 
 	 <string name="scoreboard_words_left">%s words left</string>
  	<string name="scoreboard_1_word_left">1 word left</string>
- 	<string name="scoreboard_countdown_start">3:00</string>
+ 	<string name="scoreboard_countdown_start">1:30</string>
+ 	<string name="scoreboard_countdown_double_time_start">3:00</string>
+ 	<string name="scoreboard_countdown_spped_round_start">0:45</string>
  	<string name="scoreboard_countdown">%1$s:%2$s</string>
  	<string name="scoreboard_countdown_completed">0:00</string>
  	
@@ -188,4 +190,11 @@
 	 <string name="game_surface_race_word_opponent_played">%1$s has already played %2$s</string>	
 	 <string name="game_surface_race_word_already_played">you have already played %1$s</string> 
 	 <string name="game_surface_race_word_invalid">%s is not a valid word</string>
+	 
+	 <string name="game_surface_race_lookup_definition">tap any word to look up it\'s definition</string>
+	 <string name="game_surface_opponent_winner_message">%s won!</string>
+	 <string name="game_surface_player_winner_message">You won!</string>	 
+	 <string name="game_surface_draw_message">It\'s a draw!</string>
+	 <string name="game_surface_opponents_words">%s\'s words</string>
+	 <string name="game_surface_players_words">your words</string>
 </resources>

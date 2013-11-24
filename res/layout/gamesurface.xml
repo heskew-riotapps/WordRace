@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
     style="@style/LayoutStyle" 
     android:orientation="vertical"
 	>
@@ -17,7 +19,7 @@
 			<TextView
 			    android:id="@+id/tvCountdown"
 			    style="@style/CountdownTextStyle" 
-			    android:text="@string/scoreboard_countdown_start"
+			    
 			/>
 			<ImageView 
 			  	style="@style/SubScoreboardLogoStyle"
@@ -44,17 +46,7 @@
 		     >
 		     <TextView 
 		         android:id="@+id/tvOpponentWordListTitle"
-		         android:layout_width="fill_parent"
-		       
-		         android:layout_height="wrap_content"
-		         android:paddingTop="2dp"
-		         android:paddingBottom="2dp"
-		         android:text="opponent's words"
-		         android:includeFontPadding="false"
-				 android:gravity="center" 
-		         android:textSize="11sp"
-		         android:textColor="@color/word_list_area_opponent_title_text"
-		         android:background="@color/word_list_area_opponent_title_background"
+		         style="@style/WordListOpponentTitleStyle"
 		         />
 	 	     <ListView 
 			    android:layout_width="fill_parent"
@@ -77,15 +69,8 @@
         	    >
 		 	     <TextView 
 			         android:id="@+id/tvPlayerWordListTitle"
-			         android:layout_width="fill_parent"
-			         android:gravity="center"
-			         android:textSize="11sp"
-			         android:layout_height="wrap_content"
-			         android:paddingTop="2dp"
-			         android:paddingBottom="2dp"
-			         android:text="your words"
-			         android:textColor="@color/word_list_area_player_title_text"
-			         android:background="@color/word_list_area_player_title_background"
+			          style="@style/WordListPlayerTitleStyle"
+			         android:text="@string/game_surface_players_words"
 			         />
 	     		<ListView 
 				    android:layout_width="fill_parent"
@@ -111,6 +96,15 @@
 		     android:layout_width="fill_parent"
 		     android:layout_height="wrap_content"
 	        style="@style/GameBoardButtonAreaStyle">
+	     	<TextView 
+	     	    android:id="@+id/tvWinner"
+	     	    style="@style/GameboardWinnerTextStyle"
+	     	    />	
+	     	 <TextView 
+	     	    android:id="@+id/tvLookupDefinitions"
+	     	    style="@style/GameboardLookupDefinitionTextStyle"
+	     	    android:text="@string/game_surface_race_lookup_definition"
+	     	    />	
 			<ImageView  
 		  	    android:id="@+id/ivPlayedLetter1"
 		        android:layout_marginRight="1dp"	        
@@ -287,7 +281,20 @@
 	        android:layout_weight="1.0"
 	        android:text="@string/gameboard_play_button_text"
 	    />
-		 
+		</LinearLayout>
+		<LinearLayout 	
+		    android:id="@+id/llAdWrapper"
+		    style="@style/GameBoardAdAreaStyle">
+			    
+		 <com.google.ads.AdView  
+          android:id="@+id/adView"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           ads:adUnitId="@string/admob_pub_id_about"
+           android:layout_centerHorizontal="true" 
+           ads:adSize="BANNER"
+           ads:testDevices="TEST_EMULATOR"
+           ads:loadAdOnCreate="false"/>
 	  
 	    </LinearLayout>
        </LinearLayout>
