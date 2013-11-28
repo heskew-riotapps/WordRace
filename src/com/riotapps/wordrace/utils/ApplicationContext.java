@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.riotapps.wordbase.utils.Constants;
 import com.riotapps.wordbase.utils.IntentExtra;
+import com.riotapps.wordbase.utils.Logger;
 
 import android.app.Application;
 import android.content.Context;
@@ -27,10 +28,12 @@ public class ApplicationContext extends com.riotapps.wordbase.utils.ApplicationC
 	}
 	
 	public void startNewActivity(Context context, String activity, List<IntentExtra> extras){
+		Logger.d(TAG, "startNewActivity " + activity);
  		if (activity.equals(Constants.ACTIVITY_CLASS_SPLASH)){
  			openNewActivity(context, com.riotapps.wordrace.Splash.class, extras);
  		}
  		else if (activity.equals(Constants.ACTIVITY_CLASS_MAIN)){
+ 			Logger.d(TAG, "startNewActivity Constants.ACTIVITY_CLASS_MAIN");
  			openNewActivity(context, com.riotapps.wordrace.Main.class, extras);
  		}
  		else if (activity.equals(Constants.ACTIVITY_CLASS_ABOUT)){

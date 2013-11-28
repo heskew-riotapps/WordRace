@@ -3,11 +3,11 @@
 	<style name="SubScoreboardLogoStyle" >
    		<item name="android:layout_marginRight">8dp</item>
    		<item name="android:layout_alignParentRight">true</item>
-   	   	<item name="android:layout_width">180dp</item>
+   	   	<item name="android:layout_width">100dp</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:gravity">center_vertical</item>   -
-		<item name="android:src">@drawable/top_logo</item>
-		<item name="android:textSize">40sp</item>
+		<item name="android:src">@drawable/gameboard_logo</item>
+		 
 	</style>
 </resources>	   
  

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.content.Context;
+
 import com.google.gson.annotations.SerializedName;
 import com.riotapps.wordbase.hooks.Opponent;
 import com.riotapps.wordbase.hooks.OpponentService;
@@ -11,6 +13,9 @@ import com.riotapps.wordbase.hooks.PlayedTile;
 import com.riotapps.wordbase.hooks.PlayedTurn;
 import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.PlayerGame;
+import com.riotapps.wordbase.utils.Constants;
+import com.riotapps.wordbase.utils.Utils;
+import com.riotapps.wordrace.R;
 
  
 public class Game {
@@ -49,8 +54,17 @@ public class Game {
 	@SerializedName("r")
 	private int round = 1;
 
+	@SerializedName("cd")
+	private long countdown = 0;
+	
+	
+	private Opponent opponent;
+
 	public Opponent getOpponent(){
-		return OpponentService.getOpponent(this.opponentId);
+		if (opponent == null){
+			opponent = OpponentService.getOpponent(this.opponentId);
+		}
+		return opponent;
 	}
 	public String getId() {
 		return id;
@@ -143,17 +157,17 @@ public class Game {
 	
 	public boolean isOriginalType()
 	{
-		return this.gameType == 0;
+		return this.gameType == Constants.RACE_GAME_TYPE_90_SECOND_DASH;
 	}
 	
 	public boolean isSpeedRoundType()
 	{
-		return this.gameType == 1;
+		return this.gameType == Constants.RACE_GAME_TYPE_SPEED_ROUNDS;
 	}
 	
 	public boolean isDoubleTimeType()
 	{
-		return this.gameType == 2;
+		return this.gameType == Constants.RACE_GAME_TYPE_DOUBLE_TIME;
 	}
 	public int getRound() {
 		return round;
@@ -161,6 +175,25 @@ public class Game {
 	public void setRound(int round) {
 		this.round = round;
 	}
-	
-	
+	public long getCountdown() {
+		return countdown;
+	}
+	public void setCountdown(long countdown) {
+		this.countdown = countdown;
+	}
+	public String getLastActionText(Context context){
+		String timeSince = Utils.getTimeSinceString(context, this.getCreateDate());
+		 
+		
+		if (this.getOpponentScore() > this.getPlayerScore()){
+			return String.format(context.getString(R.string.game_opponent_winner_message), timeSince, this.getOpponent().getName(), this.getOpponentScore(), this.getPlayerScore());
+		}
+		else if(this.getPlayerScore() > this.getOpponentScore()){
+			return String.format(context.getString(R.string.game_player_winner_message), timeSince, this.getPlayerScore(), this.getOpponentScore());
+		}
+		else {
+			return String.format(context.getString(R.string.game_draw_message), timeSince, this.getPlayerScore(), this.getOpponentScore());
+		}	 
+	}
+
 }

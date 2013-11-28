@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+     xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    >
+    
+    	<com.google.ads.AdView  
+          android:id="@+id/adView"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignParentBottom="true"
+           ads:adUnitId="@string/admob_pub_id_full_rules"
+           android:layout_centerHorizontal="true" 
+           ads:adSize="BANNER"
+           ads:testDevices="TEST_EMULATOR"
+           ads:loadAdOnCreate="false"/>
+<LinearLayout  
+    android:layout_above="@id/adView" 
+    style="@style/LayoutStyle"
+    android:layout_marginBottom="5dp"
+    android:orientation="vertical" >
+   
+     <include android:id="@+id/topAreaLayout" layout="@layout/toparealayout" />
+
+   <LinearLayout
+         style="@style/LayoutFormStyle"
+                android:layout_height="fill_parent"
+     
+         >
+	<LinearLayout
+		style="@style/FormBackgroundStyle"
+					android:layout_marginTop="5dp"
+				 android:layout_marginBottom="5dp"
+				 android:orientation="vertical"
+				 android:layout_width="fill_parent"
+				 android:layout_height="fill_parent"
+		
+	>
+		<TextView
+		        style="@style/ContentAreaTextTopStyle"
+		           android:paddingTop="0dp"
+		        android:layout_height="12dp"
+		        />
+		  <LinearLayout 
+            style="@style/ContentAreaTextBottomStyle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+         android:orientation="vertical"
+        >
+    <ScrollView   
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent" 
+    	android:fadingEdge="none"
+    	
+    	 >
+	<LinearLayout 
+	   	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent" 
+		android:orientation="vertical"
+	    > 
+	
+    <TextView
+        style="@style/ContentAreaTextStyle"
+        android:text="@string/full_rules_1" 
+       android:id="@+id/tvFullRulesBasics_1"
+        />
+   <TextView
+       style="@style/ContentAreaTextAreaStyle"
+        android:text="@string/full_rules_2" 
+        android:id="@+id/tvFullRulesBasics_2"
+        />	
+   <TextView
+       style="@style/ContentAreaTextAreaStyle"
+        android:text="@string/full_rules_3" 
+         android:id="@+id/tvFullRulesBasics_3"
+        />
+   <TextView
+       style="@style/ContentAreaTextAreaStyle"
+        android:text="@string/full_rules_4" 
+         android:id="@+id/tvFullRulesBasics_4"
+        />
+     <TextView
+      style="@style/ContentAreaTextAreaStyle"
+       android:text="@string/full_rules_5" 
+        android:id="@+id/tvFullRulesBasics_5"
+     />
+     <TextView
+      	style="@style/ContentAreaTextAreaStyle"
+       	android:text="@string/full_rules_6" 
+        android:id="@+id/tvFullRulesBasics_6"
+       />
+   <!-- the letters -->
+   <!-- scoring -->
+ 	
+   <TextView
+       style="@style/ContentAreaTextAreaStyle"
+        android:text="@string/full_rules_letters_1" 
+        android:paddingBottom="1dp"
+        android:id="@+id/tvFullRulesScoring_1"
+        />
+      <TextView
+       style="@style/ContentAreaTextStyle"
+        android:text="@string/full_rules_letters_2" 
+        android:paddingLeft="10dp"
+        android:paddingBottom="1dp"
+        android:paddingTop="1dp"
+        android:id="@+id/tvFullRulesScoring_2"
+        />
+   <TableLayout
+       style="@style/ContentAreaTextAreaStyle" 
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:stretchColumns="*">
+    <TableRow style="@style/RulesTableRowStyle" >
+        <TextView
+            android:text="@string/full_rules_letter1_value"
+      		style="@style/LetterValueStyle"
+      		android:id="@+id/tvFullRulesLetters_1_value"
+		/>
+ 		<TextView
+            android:text="@string/full_rules_letter2_value"
+      		style="@style/LetterValueStyle"    
+      		android:id="@+id/tvFullRulesLetters_2_value"   
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter3_value"
+      		style="@style/LetterValueStyle"      
+      		android:id="@+id/tvFullRulesLetters_3_value"    
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter4_value"
+      		style="@style/LetterValueStyle"
+      		android:id="@+id/tvFullRulesLetters_4_value"
+        />
+
+    </TableRow>
+    <TableRow style="@style/RulesTableRowStyle" >
+        <TextView
+            android:text="@string/full_rules_letter5_value"
+      		style="@style/LetterValueStyle"
+      		android:id="@+id/tvFullRulesLetters_5_value"
+        />
+        <TextView
+            android:text="@string/full_rules_letter6_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_6_value"
+		/>
+ 		<TextView
+            android:text="@string/full_rules_letter7_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_7_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter8_value"
+            style="@style/LetterValueStyle"
+			android:id="@+id/tvFullRulesLetters_8_value" 
+        />
+     </TableRow>
+    <TableRow style="@style/RulesTableRowStyle" >
+
+ 		<TextView
+            android:text="@string/full_rules_letter9_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_9_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter10_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_10_value"
+		/>
+        <TextView
+            android:text="@string/full_rules_letter11_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_11_value"
+		/>
+ 		<TextView
+            android:text="@string/full_rules_letter12_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_12_value"
+        />
+    </TableRow>
+    <TableRow style="@style/RulesTableRowStyle" >
+
+ 		<TextView
+            android:text="@string/full_rules_letter13_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_13_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter14_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_14_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter15_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_15_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter16_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_16_value"
+        />
+    </TableRow>
+    <TableRow style="@style/RulesTableRowStyle" >
+
+ 		<TextView
+            android:text="@string/full_rules_letter17_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_17_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter18_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_18_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter19_value"
+            style="@style/LetterValueStyle"
+          android:id="@+id/tvFullRulesLetters_19_value"  
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter20_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_20_value"
+        />
+    </TableRow>
+    <TableRow style="@style/RulesTableRowStyle" >
+
+ 		<TextView
+            android:text="@string/full_rules_letter21_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_21_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter22_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_22_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter23_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_23_value"
+        />
+ 		<TextView
+            android:text="@string/full_rules_letter24_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_24_value"
+        />
+    </TableRow>
+    <TableRow style="@style/RulesTableRowStyle" >
+
+ 		<TextView
+ 		    style="@style/LetterValueStyle"
+            android:text="@string/full_rules_letter25_value"
+            android:id="@+id/tvFullRulesLetters_25_value"
+         />
+ 		<TextView
+            android:text="@string/full_rules_letter26_value"
+            style="@style/LetterValueStyle"
+            android:id="@+id/tvFullRulesLetters_26_value"
+        />
+    </TableRow>
+ 	</TableLayout>
+  
+ 		<!-- dictionary -->
+ 		<TextView
+       style="@style/ContentAreaTextAreaStyle"
+        android:text="@string/full_rules_dictionary_1" 
+        android:id="@+id/tvFullRulesDictionary_1"
+        />
+ 		<TextView
+       		style="@style/ContentAreaTextBottomStyle"
+       		android:drawableTop="@null"
+       		 
+        	android:text="@string/full_rules_dictionary_2" 
+        	android:paddingLeft="10dp"
+        	android:paddingBottom="15dp"
+        	android:id="@+id/tvFullRulesDictionary_2"
+        	
+        />
+ 
+</LinearLayout>
+ </ScrollView> 
+</LinearLayout>
+</LinearLayout> 
+   </LinearLayout> 
+
+</LinearLayout> 
+</RelativeLayout>

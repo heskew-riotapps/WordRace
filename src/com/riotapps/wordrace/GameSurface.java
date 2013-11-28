@@ -17,7 +17,6 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
 import com.riotapps.wordrace.R;
 import com.riotapps.wordrace.hooks.GameService;
-import com.riotapps.wordbase.GameHistory;
 import com.riotapps.wordbase.hooks.AlphabetService;
 import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.Player;
@@ -27,7 +26,6 @@ import com.riotapps.wordbase.interfaces.ICloseDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
 import com.riotapps.wordbase.ui.CustomProgressDialog;
 import com.riotapps.wordbase.ui.CustomToast;
-import com.riotapps.wordbase.ui.GameStateService;
 import com.riotapps.wordbase.ui.MenuUtils;
 import com.riotapps.wordbase.utils.ApplicationContext;
 import com.riotapps.wordbase.utils.Constants;
@@ -40,6 +38,7 @@ import com.riotapps.wordrace.hooks.Game;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -74,6 +73,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private boolean isAdMobActive;
 	 private Chartboost cb;
 	 private CountDownTimer countdown = null;
+	 private TextView tvShortInfo;
 	 private TextView tvCountdown;
 	 private TextView tvNumPoints;
 	 private TextView tvWinner;
@@ -89,6 +89,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private LinearLayout llButtons;
 	 private LinearLayout llAdWrapper;
 	 private List<OpponentWord> opponentWords = new ArrayList<OpponentWord>();
+	 private boolean isCountdownRunning = false;
+	 private boolean freezeAction = false;
  
 	private	LayoutInflater inflater;
 
@@ -187,7 +189,6 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private ImageView bLetter10;	
 
 	 private List<String> hopper = new ArrayList<String>();
-	 private List<String> hopperState = new ArrayList<String>();
 	 private List<String> currentWord = new ArrayList<String>();
 	 
 	 private static Bitmap getTrayLetter_A(Context context, int tileSize){
@@ -572,17 +573,25 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gamesurface);
 		
-		this.setGameId();
-	 	this.game = GameService.getGame(gameId); //(Game) i.getParcelableExtra(Constants.EXTRA_GAME);
-		
-	 	this.loadViews();
-	 	this.setupMenu();
-	 	this.setupGame();
-	 	this.loadLetterViews();
-	 	this.loadButtons();
-	 	this.initializeWordLists();
-	 	this.setCompletedState();
+		Logger.d(TAG, "onCreate called");
+		this.handleKickoff();
+
+	 //	this.setupPreloadTask();
 	}
+	
+	private void setStartState(){
+		//if the game was stopped before completion
+		Logger.d(TAG, "setStartState game.isStarted() " + this.game.isStarted() + " type=" + this.game.isSpeedRoundType() + " countdown=" + this.game.getCountdown() + " round=" + this.game.getRound());
+		if (this.game.getCountdown() == 0 && this.game.isSpeedRoundType() & (this.game.getRound() == 2 || this.game.getRound() == 3)){
+			this.game.setCountdown(this.getResources().getInteger(R.integer.gameTypeSpeedRoundsCountdownStart));
+		}
+		Logger.d(TAG, "setStartState game.isStarted() " + this.game.isStarted() + " type=" + this.game.isSpeedRoundType() + " countdown=" + this.game.getCountdown() + " round=" + this.game.getRound());
+
+		if (this.game.isStarted() && this.game.getCountdown() > 0){
+			this.setCountdown(this.game.getCountdown());
+		}
+	}
+	
 	 
 	@Override
 	public void onBackPressed() {
@@ -590,15 +599,30 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		//super.onBackPressed();
 		//override back button in case user just started game. this will make sure they don;t back through 
 		//all of the pick opponent activities
- 
+		Logger.d(TAG, "onBackPressed called");
+/*
+		if (this.countdown != null){
+			this.countdown.cancel();
+			this.countdown = null;
+		}
+	
+		if (this.preloadTask != null){
+			this.preloadTask = null;
+		}
+
+		if (this.autoPlayTask != null){
+			this.autoPlayTask = null;
+		}
+*/
+		
 		if (this.isChartBoostActive && this.cb.onBackPressed())
 			// If a Chartboost view exists, close it and return
 			return;
 		else if (this.game.isCompleted() && !this.isCompletedThisSession){
 			//if game is completed, just go back to whatever activity is in the stack
 			 
-			this.game = null;
-			this.player = null;
+	//		this.game = null;
+	//		this.player = null;
 
 			super.onBackPressed();
 		}
@@ -612,6 +636,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		if (this.game.isCompleted()) {
 			backToMain = true;
 		}
+		/*
 		else {
 			GameService.saveGame(this.game);
 		}
@@ -627,7 +652,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		
 		this.game = null;
 		this.player = null;
-		
+		*/
 		if (backToMain){
 			//in this case the game was completed in this session so lets just send player to main activity
 			((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_MAIN);
@@ -699,6 +724,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	
 	private void setCompletedState(){
 		if (this.game.isCompleted()){
+			this.tvShortInfo.setVisibility(View.GONE);
 			
 			this.ivPlayedLetter1.setVisibility(View.GONE);
 			this.ivPlayedLetter2.setVisibility(View.GONE);
@@ -718,7 +744,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 				this.tvWinner.setText(String.format(this.getString(R.string.game_surface_opponent_winner_message), this.game.getOpponent().getName()));
 			}
 			else if(this.game.getPlayerScore() > this.game.getOpponentScore()){
-				this.tvWinner.setText(this.getString(R.string.game_surface_player_winner_message));
+				this.tvWinner.setText(String.format(this.getString(R.string.game_surface_player_winner_message), this.player.getNumWins() + 1));
 			}
 			else {
 				this.tvWinner.setText(this.getString(R.string.game_surface_draw_message));
@@ -747,6 +773,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	private void loadViews(){
 		this.inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+		this.tvShortInfo = (TextView)this.findViewById(R.id.tvShortInfo);
 		this.tvCountdown = (TextView)this.findViewById(R.id.tvCountdown);
 		this.tvNumPoints = (TextView)this.findViewById(R.id.tvNumPoints);
 		this.tvLookupDefinitions = (TextView)this.findViewById(R.id.tvLookupDefinitions);
@@ -756,6 +783,15 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.tvPlayerScore = (TextView)this.findViewById(R.id.tvPlayerScore);
 		this.lvOpponent = (ListView)this.findViewById(R.id.lvOpponent);
 		this.lvPlayer = (ListView)this.findViewById(R.id.lvPlayer);
+		TextView tvType = (TextView)this.findViewById(R.id.tvType);
+		tvType.setText(this.getString(R.string.game_surface_dash_title));
+		if (this.game.isSpeedRoundType()){
+			tvType.setText(this.getString(R.string.game_surface_speed_rounds_title));
+		}
+		else if (this.game.isDoubleTimeType()){
+			tvType.setText(this.getString(R.string.game_surface_double_time_title));
+		}
+		
 		
 		this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_start));
 		if (this.game.isSpeedRoundType()){
@@ -1120,14 +1156,114 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
  	}
 	
+	
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		Logger.d(TAG, "onResume called");
+	 
+		super.onResume();
+		
+	//	this.handleKickoff();
+ 	 	this.setupPreloadTask();
+	}
+
+	@Override
+	protected void onStart() {
+		Logger.d(TAG, "onStart called");
+		super.onStart();
+		
+		this.handleKickoff();
+	}
+
+	@Override
+	protected void onStop() {
+		Logger.d(TAG, "onStop called");
+		super.onStop();
+		
+		if (this.countdown != null){
+			Logger.d(TAG, "countdown onStop called");
+			if (this.game != null) {
+				Logger.d(TAG, "onStop countdown=" + this.game.getCountdown());
+			}
+			
+			this.countdown.cancel();
+			this.countdown = null;
+		}
+	
+		if (this.preloadTask != null){
+			Logger.d(TAG, "preloadTask stop called");
+			this.preloadTask = null;
+		}
+
+		if (this.autoPlayTask != null){
+			Logger.d(TAG, "autoPlayTask Stop called");
+			this.autoPlayTask = null;
+		}
+		
+		if (this.game != null && !this.game.isCompleted()) {
+			GameService.saveGame(this.game);
+		}
+
+	//	this.game = null;
+	//	this.player = null;
+	}
+
+	private void handleKickoff(){
+		Logger.d(TAG, "handleKickoff game is null " + (game == null));
+		if (this.game == null){
+			this.setGameId();
+		 	this.game = GameService.getGame(gameId); //(Game) i.getParcelableExtra(Constants.EXTRA_GAME);
+			
+		 	if (this.game != null){
+			 	this.loadViews();
+			 	this.setupMenu();
+			 	this.setupGame();
+			 	this.loadLetterViews();
+			 	this.loadButtons();
+			 	this.initializeWordLists();
+			 	this.setCompletedState();
+		 	}
+		}
+	}
+	
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		Logger.d(TAG, "onRestart called");
+	 
+		super.onRestart();
+	}
+
+	private void setupPreloadTask(){
+		this.setupPreloadTask(this.getString(R.string.progress_loading));
+	}
+
+	private void setupPreloadTask(String message){
+		Logger.d(TAG, "setupPreloadTask called");
+		if ((this.game.isActive() || this.game.isStarted()) && this.possibleWords.size() == 0 ){
+			Logger.d(TAG, "setupPreloadTask this.possibleWords.size() == 0");
+			this.preloadTask = new PreLoadTask();
+			
+			spinner = new CustomProgressDialog(this);
+			spinner.setMessage(message);
+			spinner.show();
+			
+			Logger.d(TAG, "PreloadTask about to be called");
+			//this.preloadTask.execute();
+			this.preloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
+		}
+		else{
+			 GameSurface.this.setStartState();		 
+		}
+	}
+	
 	private void setupGame(){
 		// Logger.d(TAG,"setupGame game turn=" + this.game.getTurn());
-		spinner = new CustomProgressDialog(this);
-		spinner.setMessage(this.getString(R.string.progress_loading));
-		spinner.show();
-		
-		this.preloadTask = new PreLoadTask();
-		this.preloadTask.execute();
+	//	spinner = new CustomProgressDialog(this);
+	//	spinner.setMessage(this.getString(R.string.progress_loading));
+	//	spinner.show();
 		
 		GameService.loadScoreboard(this, this.game);
 		
@@ -1146,7 +1282,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		  
 		 @Override
 		 protected Void doInBackground(Void... params) {
-			// if (GameSurface.this.game.isActive()){
+			 Logger.d(GameSurface.TAG, "PreLoadTask doInBackground called");
+			 
+			  if (GameSurface.this.game.isActive() || GameSurface.this.game.isStarted() ){  
+				 
 					//go get words and store in memory in GameSurface
 					List<List<String>> letterSets = GameService.getSortedRaceLetterSets(game.getHopper());
 					/*
@@ -1163,6 +1302,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 						
 						
 					}*/
+					
+					Logger.d(TAG, "PreLoadTask about to load word service");
 			        WordService wordService = new WordService(GameSurface.this);
 
 					
@@ -1214,7 +1355,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 						 GameService.saveGame(GameSurface.this.game);
 			//	GameSurface.this.autoPlay();
 						 
-					// }
+			}
 	    	 
 	    	 return null;
 
@@ -1224,6 +1365,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	   //      setProgressPercent(progress[0]);
 	   //  }
 	     protected void onPostExecute(Void param) {
+			 Logger.d(GameSurface.TAG, "PreLoadTask onPostExecute called");
 	    //	 if (GameSurface.this.game.isActive()){
 	    		 TextView tvWordsLeft = (TextView)GameSurface.this.findViewById(com.riotapps.wordrace.R.id.tvWordsLeft); 
 		  
@@ -1234,14 +1376,18 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	    		 GameSurface.this.spinner.dismiss();
 	    		 GameSurface.this.spinner = null;
 	 		}
+			
+	    	 GameSurface.this.setStartState();		 
+
 	     }
 
 	 
 	 }
 	 
 	private void autoPlay(){
+		Logger.d(TAG, "autoPlay called");
 		this.autoPlayTask =  new AutoPlayTask();
-		this.autoPlayTask.execute();
+		this.autoPlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null); //.execute();
 	}
 	
     private void dismissCustomDialog(){
@@ -1259,8 +1405,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 			this.trackEvent(Constants.TRACKER_CATEGORY_GAMEBOARD, Constants.TRACKER_ACTION_BUTTON_TAPPED,
 	        			Constants.TRACKER_LABEL_START_OK, Constants.TRACKER_DEFAULT_OPTION_VALUE);
 	 			
-	 			this.handleStartOK(); 
-	 			break;
+	 			this.handleStartOnClick(); 
+	 			break; 
 		   case Constants.RETURN_CODE_CUSTOM_DIALOG_START_CANCEL_CLICKED: 
 			    this.dismissCustomDialog(); 
 
@@ -1352,7 +1498,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			//temp 
 			int x = 0;
 			
-			while (play){
+			while (play && GameSurface.this.isCountdownRunning){
 				if(!GameSurface.this.game.isStarted()) {
 					play = false;
 					break;
@@ -1360,7 +1506,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 				
 				x += 1;
 				
-				if (x >=20) {play=false;break;}
+			//	if (x >=20) {play=false;break;}
 				try {
 					Thread.sleep(Utils.getRandomNumberFromRange(minDelay, maxDelay));
 				} catch (InterruptedException e) {
@@ -1369,7 +1515,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 				}
 				
 				//in case game ends before thread if completed
-				if(!GameSurface.this.game.isStarted()) {
+				if(GameSurface.this.game == null || !GameSurface.this.game.isStarted()) {
 					play = false;
 					break;
 				}
@@ -1466,13 +1612,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 						case Constants.SKILL_LEVEL_EXPERT:
 							//top 20% (or top 10%) unless losing by 80
 							
-							base = Math.round(numOptions / 5); 
-							start = 0;	
+							base = Math.round(numOptions / 6); 
+							start = Math.round(numOptions / 10);	
 							if (Utils.coinFlip() == Constants.COIN_FLIP_HEADS){
 								base = Math.round(numOptions / 10); 
 							}
 
-							randomIndex = Utils.getRandomNumberFromRange(numOptions - base, numOptions - 1);
+							randomIndex = Utils.getRandomNumberFromRange(start, numOptions - base);
 							
 							//if opponent is losing by 100 or more, play the highest score or second highest score 
 							//if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 20){
@@ -1481,7 +1627,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 							break;
 						case Constants.SKILL_LEVEL_MASTER:
 							base = Math.round(numOptions / 4); 
-							start = 0;
+							start = Math.round(numOptions * .2F);
 							//if opponent is losing by 100 or more, play from the top 5% 
 							if (GameSurface.this.game.getPlayerScore() > GameSurface.this.game.getOpponentScore() + 20){
 								start = numOptions - Math.round(numOptions / 20); 
@@ -1625,6 +1771,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
+
 	 	if (v.getId() == R.id.bStart) {
 			this.handleStartOnClick();
 		} 
@@ -1703,14 +1850,15 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.hopper.clear();
 		for (String letter : this.game.getHopper()){
 			this.hopper.add(letter);
+			Logger.d(TAG, "initializeHopper letter=" + letter);
 		}
-		for (String letter : this.game.getHopper()){
-			this.hopperState.add(letter);
-		}
+		//for (String letter : this.game.getHopper()){
+		//	this.hopperState.add(letter);
+		//}
 	}
 	
 	private void handleRecall(){
-		
+		if (this.freezeAction){ return; }
 		this.initializePlayedTiles();
 		this.initializeHopper();
 		this.initializeTray();
@@ -1783,6 +1931,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		// <string name="game_surface_race_word_opponent_played">%1$s has already played %2$s</string>	
 		// <string name="game_surface_race_word_already_played">you have already played %2$s</string> 
 		// <string name="game_surface_race_word_invalid">%1$s has already played %2$s</string>
+		if (this.freezeAction){ return; }
+		
 		String word = "";
  
 		for (String letter : this.currentWord){
@@ -1859,7 +2009,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	this.opponentListadapter = new PlayedWordAdapter(this, this.wordListPlayedByOpponent);
 		this.lvOpponent.setAdapter(this.opponentListadapter); 
 		
-		if (this.game.getPlayedWords().size() > 0){
+		if (this.game.getPlayedWords().size() > 0 && (this.wordListPlayedByPlayer.size() == 0 || this.wordListPlayedByOpponent.size() == 0) ){
 			//game is completed or underway, load up lists
 			for (PlayedWord word : this.game.getPlayedWords()){
 				if (word.isOpponentPlay()){
@@ -1912,6 +2062,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	
 	private void handleShuffle(){
 		//only allow shuffle if all letters are in tray?
+		Logger.d(TAG, "handleShuffle called");
+		if (this.freezeAction){ return; }
 		Boolean allow = true;
 		
 		for (String letter : this.hopper){
@@ -1932,6 +2084,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	}
 	
 	private void handlePlayedLetterOnClick(int id){
+		if (this.freezeAction){ return; }
 		if (!this.game.isStarted()) { return; }
 		 int opening = this.findFirstOpenTraySlot();
 
@@ -1992,6 +2145,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	}
 	
 	private void handleTrayOnClick(int id){
+		if (this.freezeAction){ return; }
 		if (!this.game.isStarted()) { return; }
 		int locationForClickedLetter = findFirstOpenWordSlot();
 		
@@ -2277,10 +2431,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	    	this.customDialog.show();	
 		   
 	   }
-	   
+	   /*
 	   private void handleStartOnClick(){
 		   this.handleStartOK();
-		   /*
+		   /
 	    	this.customDialog = new CustomButtonDialog(this, 
 	    			this.getString(R.string.game_surface_start_game_confirmation_title), 
 	    			this.getString(R.string.game_surface_start_game_confirmation_text),
@@ -2291,8 +2445,9 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					Constants.RETURN_CODE_CUSTOM_DIALOG_START_CLOSE_CLICKED);
 	    
 	    	this.customDialog.show();	
-		*/
+		/
    	   }
+	*/
 
 	   private void handleCancelOK(){
 		   GameService.cancel(this.getPlayer(), this.game);
@@ -2302,50 +2457,76 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
 	   }
 	   
-	   private void handleStartOK(){
+	   private void handleStartOnClick(){
 		 //make countdown timer a variable so that it can be killed in stop/pause
 		   //change game status to started (5)
 		   GameService.startGame(this.game);
 		   this.loadButtons();
 			
 		   //might need a start delay here at some point
-		   int timerLength = 90000; //2 minutes
+		   int timerLength = this.getResources().getInteger(R.integer.gameTypeDashCountdownStart); //2 minutes
 		   if (this.game.isDoubleTimeType()){
-			   timerLength = 180000;
+			   timerLength = this.getResources().getInteger(R.integer.gameTypeDoubleTimeCountdownStart);
 		   }
 		   else if(this.game.isSpeedRoundType()){
-			   timerLength = 45000;
+			   timerLength = this.getResources().getInteger(R.integer.gameTypeSpeedRoundsCountdownStart);
 		   }
 		   
-		   this.countdown = new CountDownTimer(timerLength, 1000) {
-
-			     public void onTick(long millisUntilFinished) {
-			    	 int secondsUntilFinished = (int) millisUntilFinished / 1000;
-			    	 int minutesLeft = (int) secondsUntilFinished / 60;
-			    	 int secondsLeft = secondsUntilFinished - (minutesLeft * 60);
-			    
-			         GameSurface.this.tvCountdown.setText(String.format(GameSurface.this.getString(R.string.scoreboard_countdown), minutesLeft, String.format("%02d", secondsLeft)));
-			     }
-
-			     
-			     public void onFinish() {
-			        // mTextField.setText("done!");
-			    	 GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
-			
-			    	 if (GameSurface.this.game.isSpeedRoundType()){
-			    		GameSurface.this.handleRound(2); 
-			    	 }
-			    	 else{
-			    		 GameSurface.this.handleCompletion();
-			    	 }
-			     }
-			  };
-			  
-			  
-			  this.countdown.start();
-	 		 
-			  this.autoPlay();
+		   this.setCountdown(timerLength);
 				
+	   }
+	   
+	   private void setCountdown(long startingPointInMilliseconds){
+		   Logger.d(TAG, "setCountdown startingPointInMilliseconds=" + startingPointInMilliseconds);
+		   
+		   this.countdown = new CountDownTimer(startingPointInMilliseconds, 1000) {
+
+		     public void onTick(long millisUntilFinished) {
+		    	 int secondsUntilFinished = (int) millisUntilFinished / 1000;
+		    	 int minutesLeft = (int) secondsUntilFinished / 60;
+		    	 int secondsLeft = secondsUntilFinished - (minutesLeft * 60);
+		    
+		    	 GameSurface.this.game.setCountdown(millisUntilFinished);
+		    	 
+		    	 if (minutesLeft == 0 && secondsLeft < 11){
+		    		 GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_finish_text_color)));
+		    	 }
+		    	 
+		         GameSurface.this.tvCountdown.setText(String.format(GameSurface.this.getString(R.string.scoreboard_countdown), minutesLeft, String.format("%02d", secondsLeft)));
+		     }
+
+		     
+		     public void onFinish() {
+		    	  Logger.d(TAG, "setCountdown onFinish");
+		    	  GameSurface.this.isCountdownRunning = false;
+		    	  GameSurface.this.freezeAction = true;
+		    	  
+		    	  GameSurface.this.game.setCountdown(0);
+				   
+		        // mTextField.setText("done!");
+		    	 GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
+	    		 GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_text_color)));
+		    	 
+		    	 if (GameSurface.this.game.isSpeedRoundType()){
+		    		GameSurface.this.handleRound(GameSurface.this.game.getRound() + 1); 
+		    	 }
+		    	 else{
+		    		 GameSurface.this.handleCompletion();
+		    	 }
+		     }
+		  };
+		  
+		  
+		  this.countdown.start();
+		  this.freezeAction = false;
+		  this.isCountdownRunning = true;
+		  
+		  if (this.game.isSpeedRoundType()){
+			  this.tvShortInfo.setText(String.format(this.getString(R.string.round_title), this.game.getRound()));
+		  }
+  	
+		  Logger.d(TAG, "setCountdown autoplay about to be called");
+		  this.autoPlay();
 	   }
 	   
 	   private void handleCompletion(){
@@ -2361,7 +2542,36 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		   //update possible words
 		   //update UI
 		   //update game round
-		   this.game.setRound(round);
+		   if (round == 3 || round == 2) {
+			   
+			   this.currentWord.clear();
+			   this.game.setRound(round);
+			   if (this.autoPlayTask != null){
+		    		this.autoPlayTask = null;
+		    	}
+		    	
+			   //reset hopper
+			   this.game.setHopper(AlphabetService.getRaceLetters());
+			   
+			   GameService.saveGame(this.game);
+			   this.initializeHopper();
+			   this.initializePlayedTiles();
+			   this.initializeTray();
+			   this.possibleWords.clear();
+			   
+			   String message = this.getString(R.string.progress_setting_up_round_2);
+			   if (round == 3){
+				   message = this.getString(R.string.progress_setting_up_round_3);
+			   }
+			   
+			   
+			   this.setupPreloadTask(message);
+		   }
+		   else{
+			   this.handleCompletion();
+		   }
+		   
+		   
 		   //kick off game again
 	   }
  	   
@@ -2722,6 +2932,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			TextView tvPlayerWordListTitle = (TextView)findViewById(R.id.tvPlayerWordListTitle);
 			TextView tvWinner = (TextView)this.findViewById(R.id.tvWinner);
 			TextView tvWordsLeft = (TextView)this.findViewById(R.id.tvWordsLeft);
+			TextView tvType = (TextView)this.findViewById(R.id.tvType);
 
 			bShuffle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bPlay.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
@@ -2732,6 +2943,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			tvPlayerWordListTitle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			tvWinner.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			tvWordsLeft.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			tvType.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			this.tvShortInfo.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 		}
 		
 		private class PlayedWordAdapter extends ArrayAdapter<PlayedWord> {

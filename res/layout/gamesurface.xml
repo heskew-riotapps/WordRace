@@ -21,6 +21,14 @@
 			    style="@style/CountdownTextStyle" 
 			    
 			/>
+			<TextView
+			    android:id="@+id/tvShortInfo"
+			    style="@style/ShortInfoTextStyle" 
+			/>
+			<TextView
+			    android:id="@+id/tvType"
+			    style="@style/GameTypeTextStyle" 
+			/>
 			<ImageView 
 			  	style="@style/SubScoreboardLogoStyle"
 			/>

@@ -71,7 +71,7 @@ public class GameService {
 
 	 }
 	
-	public static Game createGame(Context ctx, Player contextPlayer, int opponentId) throws DesignByContractException{
+	public static Game createGame(Context ctx, Player contextPlayer, int opponentId, int gameType) throws DesignByContractException{
 		//Check.Require(PlayerService.getPlayerFromLocal().getId().equals(contextPlayer.getId()), ctx.getString(R.string.validation_incorrect_context_player));
     	Check.Require(contextPlayer.getActiveGameId().length() == 0, ctx.getString(R.string.validation_create_game_duplicate));
 		
@@ -89,6 +89,8 @@ public class GameService {
     	game.setPlayerScore(0);
     	game.setOpponentId(opponentId);
     	game.setHopper(AlphabetService.getRaceLetters());
+    	game.setGameType(gameType);
+    	game.setCountdown(0);
      	
     	//determine how many total words will be available
     	game.setNumPossibleWords(0);
@@ -169,11 +171,17 @@ public class GameService {
 		return letterSets;
 	
 	}
-	public static List<List<String>> getSortedRaceLetterSetsByLength(List<String> raceLetters, int setLength){
+	public static List<List<String>> getSortedRaceLetterSetsByLength(List<String> hopper, int setLength){
 		 //grab all unique sets of tray letters in batches of "setLength"
 		 //so if the tray letters are P, R, T, A, L, B, Y and the setLength is 4
 		 //return P, R, T, A...P, R, T, L,...P, R, T, B...etc
 		 List<List<String>> letterSets = new ArrayList<List<String>>();
+		 
+		 List<String> raceLetters = new ArrayList<String>();
+		 
+		 for (String letter : hopper){
+			 raceLetters.add(letter);
+		 }
 		 
 		 Collections.sort(raceLetters);
 	

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="word_list_area_middle_border">#670099</color>
+    
+    <color name="word_list_area_middle_border">#A020F0</color> <!-- 670099 -->
     <color name="word_list_area_player_title_text">#ffffff</color>
     <color name="word_list_area_opponent_title_text">#ffffff</color>
     <color name="word_list_area_player_title_background">#ff6501</color> 
@@ -19,6 +20,8 @@
     <color name="scoreboard_text_last_played_color">#FF0000</color> <!-- #FF0000 --> 
 	<color name="sub_scoreboard_background">#29cdf0</color><!-- 177efe -->
  <color name="sub_scoreboard_text_color">#ffffff</color>
+ <color name="countdown_text_color">#ffffff</color>
+ <color name="countdown_finish_text_color">#ff0000</color>
  <color name="gameboard_winner_text">#ffffff</color>
   <color name="gameboard_lookup_definition_text">#ffffff</color>
 	<color name="button_text_color_off">#790909</color>
@@ -52,9 +55,20 @@
     <color name="content_font_color">#1874CD</color>
     <color name="form_border_color">#3366dd</color> <!-- previously 3366dd -->  
     <color name="title_bar_background_color">#FF0000</color><!-- FF0000  -->
- 
-  
- 
+    <color name="create_game_bottom_option_background">#ee5b92</color>
+    <color name="create_game_bottom_option_pressed">#D3D3D3</color>
+    <color name="create_game_bottom_option_text">#ffffff</color>
+    <color name="create_game_option_1_background">#cada39</color>
+    <color name="create_game_option_1_pressed">#D3D3D3</color>
+    <color name="create_game_option_1_text">#ffffff</color>
+     <color name="create_game_option_2_background">#29cdf0</color>
+    <color name="create_game_option_2_pressed">#D3D3D3</color>
+    <color name="create_game_option_2_text">#ffffff</color>
+    <color name="game_type_text_background">#e03b7d</color><!--e03b7d -->
+  	<color name="game_type_text">#ffffff</color>
+  	<color name="game_type_text_border">#e03b7d</color>
+ 	<color name="short_info_text">#ffffff</color>
+  	
     <color name="logo_area_bottom_background_color">#3366dd</color> 
     <color name="form_header_text_color">#1874CD</color> 
     <color name="form_header_sub_text_color">#1874CD</color> 
