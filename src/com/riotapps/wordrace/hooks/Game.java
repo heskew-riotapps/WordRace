@@ -14,6 +14,7 @@ import com.riotapps.wordbase.hooks.PlayedTurn;
 import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.PlayerGame;
 import com.riotapps.wordbase.utils.Constants;
+import com.riotapps.wordbase.utils.Logger;
 import com.riotapps.wordbase.utils.Utils;
 import com.riotapps.wordrace.R;
 
@@ -57,6 +58,11 @@ public class Game {
 	@SerializedName("cd")
 	private long countdown = 0;
 	
+	@SerializedName("wn")
+	private int winNum = 0;
+	
+	private boolean isDirty = false;
+	
 	
 	private Opponent opponent;
 
@@ -72,6 +78,7 @@ public class Game {
 
 	public void setId(String id) {
 		this.id = id;
+		this.isDirty = true;
 	}
 
 	public List<PlayedWord> getPlayedWords() {
@@ -80,6 +87,7 @@ public class Game {
 
 	public void setPlayedWords(List<PlayedWord> playedWords) {
 		this.playedWords = playedWords;
+		this.isDirty = true;
 	}
 
 	public List<String> getHopper() {
@@ -88,6 +96,7 @@ public class Game {
 
 	public void setHopper(List<String> hopper) {
 		this.hopper = hopper;
+		this.isDirty = true;
 	}
 
 	public Date getCreateDate() {
@@ -96,6 +105,7 @@ public class Game {
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
+		this.isDirty = true;
 	}
 
 	public int getOpponentId() {
@@ -104,6 +114,7 @@ public class Game {
 
 	public void setOpponentId(int opponentId) {
 		this.opponentId = opponentId;
+		this.isDirty = true;
 	}
 
 	public int getOpponentScore() {
@@ -112,6 +123,7 @@ public class Game {
 
 	public void setOpponentScore(int opponentScore) {
 		this.opponentScore = opponentScore;
+		this.isDirty = true;
 	}
 
 	public int getPlayerScore() {
@@ -124,10 +136,12 @@ public class Game {
 
 	public void setStatus(int status) {
 		this.status = status;
+		this.isDirty = true;
 	}
 
 	public void setPlayerScore(int playerScore) {
 		this.playerScore = playerScore;
+		this.isDirty = true;
 	}
 	
 	public boolean isCompleted(){
@@ -147,12 +161,14 @@ public class Game {
 
 	public void setNumPossibleWords(int numPossibleWords) {
 		this.numPossibleWords = numPossibleWords;
+		this.isDirty = true;
 	}
 	public int getGameType() {
 		return gameType;
 	}
 	public void setGameType(int gameType) {
 		this.gameType = gameType;
+		this.isDirty = true;
 	}
 	
 	public boolean isOriginalType()
@@ -174,16 +190,19 @@ public class Game {
 	}
 	public void setRound(int round) {
 		this.round = round;
+		this.isDirty = true;
 	}
 	public long getCountdown() {
 		return countdown;
 	}
 	public void setCountdown(long countdown) {
 		this.countdown = countdown;
+		this.isDirty = true;
 	}
 	public String getLastActionText(Context context){
 		String timeSince = Utils.getTimeSinceString(context, this.getCreateDate());
 		 
+		Logger.d(TAG, "getLastActionText game=" + this.id);
 		
 		if (this.getOpponentScore() > this.getPlayerScore()){
 			return String.format(context.getString(R.string.game_opponent_winner_message), timeSince, this.getOpponent().getName(), this.getOpponentScore(), this.getPlayerScore());
@@ -195,5 +214,26 @@ public class Game {
 			return String.format(context.getString(R.string.game_draw_message), timeSince, this.getPlayerScore(), this.getOpponentScore());
 		}	 
 	}
-
+	
+	
+	
+	public int getWinNum() {
+		return winNum;
+	}
+	public void setWinNum(int winNum) {
+		this.winNum = winNum;
+	}
+	public boolean isDirty() {
+		return isDirty;
+	}
+	
+	public void setDirty(boolean isDirty) {
+		this.isDirty = isDirty;
+	}
+	
+	public String getTypeTitle(Context context){
+		if (this.isOriginalType()) { return context.getString(R.string.game_surface_dash_title); }
+		else if (this.isSpeedRoundType()){ return context.getString(R.string.game_surface_speed_rounds_title); }
+		else { return context.getString(R.string.game_surface_double_time_title); }
+ 	}
 }

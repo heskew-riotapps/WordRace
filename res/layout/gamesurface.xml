@@ -21,6 +21,12 @@
 			    style="@style/CountdownTextStyle" 
 			    
 			/>
+			<Button
+			    android:id="@+id/bRematch"
+			    android:visibility="gone"
+			    style="@style/RematchButtonStyle"
+			   
+			/>
 			<TextView
 			    android:id="@+id/tvShortInfo"
 			    style="@style/ShortInfoTextStyle" 
@@ -103,7 +109,7 @@
 		     android:orientation="horizontal"
 		     android:layout_width="fill_parent"
 		     android:layout_height="wrap_content"
-	        style="@style/GameBoardButtonAreaStyle">
+	        style="@style/PlayedWordAreaStyle">
 	     	<TextView 
 	     	    android:id="@+id/tvWinner"
 	     	    style="@style/GameboardWinnerTextStyle"
@@ -298,7 +304,7 @@
           android:id="@+id/adView"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           ads:adUnitId="@string/admob_pub_id_about"
+           ads:adUnitId="@string/admob_pub_id_game_surface"
            android:layout_centerHorizontal="true" 
            ads:adSize="BANNER"
            ads:testDevices="TEST_EMULATOR"

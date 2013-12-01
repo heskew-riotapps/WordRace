@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.riotapps.wordrace.hooks.Game;
+import com.riotapps.wordbase.hooks.CompletedGame;
 import com.riotapps.wordbase.hooks.GameListItem;
 import com.riotapps.wordbase.hooks.Player;
 import com.riotapps.wordbase.utils.Constants;
@@ -90,6 +91,30 @@ public class GameData {
 		gson = null;
 	}
 	
+	
+	public static List<CompletedGame> getCompletedGameList(){
+		Gson gson = new Gson(); 
+		
+		Type type = new TypeToken<List<CompletedGame>>() {}.getType();
+	    SharedPreferences settings = Storage.getGameSharedPreferences();
+
+		List<CompletedGame> _games = gson.fromJson(settings.getString(Constants.USER_PREFS_GAME_LIST_JSON, Constants.EMPTY_JSON_ARRAY), type);
+ 
+    	gson = null;
+    	return _games;
+ 	} 
+	
+	public static void saveCompletedGameList(List<CompletedGame> games){
+		Gson gson = new Gson(); 
+		SharedPreferences settings = Storage.getGameSharedPreferences();
+        SharedPreferences.Editor editor = settings.edit();
+		
+		editor.putString(Constants.USER_PREFS_GAME_LIST_JSON, gson.toJson(games));
+		editor.apply();
+        
+		gson = null;
+	}
+	/*
 	public static List<GameListItem> getCompletedGameList(){
 		Gson gson = new Gson(); 
 		
@@ -101,7 +126,7 @@ public class GameData {
     	gson = null;
     	return _games;
  	} 
-	
+
 	public static void saveCompletedGameList(List<GameListItem> games){
 		Gson gson = new Gson(); 
 		SharedPreferences settings = Storage.getGameSharedPreferences();
@@ -111,5 +136,5 @@ public class GameData {
 		editor.apply();
         
 		gson = null;
-	}
+	}	*/
 }

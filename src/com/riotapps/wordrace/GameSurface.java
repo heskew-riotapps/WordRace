@@ -20,20 +20,24 @@ import com.riotapps.wordrace.hooks.GameService;
 import com.riotapps.wordbase.hooks.AlphabetService;
 import com.riotapps.wordbase.hooks.PlayedWord;
 import com.riotapps.wordbase.hooks.Player;
+import com.riotapps.wordbase.hooks.PlayerService;
 import com.riotapps.wordbase.hooks.StoreService;
 import com.riotapps.wordbase.hooks.WordService;
 import com.riotapps.wordbase.interfaces.ICloseDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
 import com.riotapps.wordbase.ui.CustomProgressDialog;
 import com.riotapps.wordbase.ui.CustomToast;
+import com.riotapps.wordbase.ui.DialogManager;
 import com.riotapps.wordbase.ui.MenuUtils;
 import com.riotapps.wordbase.utils.ApplicationContext;
 import com.riotapps.wordbase.utils.Constants;
+import com.riotapps.wordbase.utils.DesignByContractException;
 import com.riotapps.wordbase.utils.ImageHelper;
 import com.riotapps.wordbase.utils.IntentExtra;
 import com.riotapps.wordbase.utils.Logger;
 import com.riotapps.wordbase.utils.Utils;
 import com.riotapps.wordrace.hooks.Game;
+import com.riotapps.wordrace.ui.CreateGameDialog;
 
 import android.content.Context;
 import android.content.Intent;
@@ -64,7 +68,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	
 	 private PopupMenu popupMenu;
 	 private String gameId = ""; 
-	 
+	 private CreateGameDialog createGameDialog;
 	 private Tracker tracker;
 	 private Player player;
 	 private Game game;
@@ -92,6 +96,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 private boolean isCountdownRunning = false;
 	 private boolean freezeAction = false;
  
+	 private boolean hasPostAdRun = false;
 	private	LayoutInflater inflater;
 
 	 private CustomButtonDialog customDialog = null; 
@@ -527,7 +532,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			}
 			return GameSurface.playedEmpty;
 		}
-
+/*
 	 private static Bitmap getPlayedEmpty_6(Context context, int tileSize){
 			if (GameSurface.playedEmpty_6 == null){
 				GameSurface.playedEmpty_6 = ImageHelper.decodeSampledBitmapFromResource(context.getResources(), R.drawable.played_tile_empty_6_bg, tileSize, tileSize);
@@ -546,7 +551,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			}
 			return GameSurface.playedEmpty_10;
 		}
-	 
+	*/ 
 	 
 	 public Tracker getTracker() {
 		if (this.tracker == null){
@@ -575,12 +580,20 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		
 		Logger.d(TAG, "onCreate called");
 		this.handleKickoff();
+		
+		this.setupAdServer();
 
 	 //	this.setupPreloadTask();
 	}
 	
 	private void setStartState(){
 		//if the game was stopped before completion
+		
+		//if game was stopped before countdown started
+		if (this.game.getCountdown() == 0 && this.game.isStarted()){
+			this.game.setCountdown(this.getTimerStart());
+		}
+
 		Logger.d(TAG, "setStartState game.isStarted() " + this.game.isStarted() + " type=" + this.game.isSpeedRoundType() + " countdown=" + this.game.getCountdown() + " round=" + this.game.getRound());
 		if (this.game.getCountdown() == 0 && this.game.isSpeedRoundType() & (this.game.getRound() == 2 || this.game.getRound() == 3)){
 			this.game.setCountdown(this.getResources().getInteger(R.integer.gameTypeSpeedRoundsCountdownStart));
@@ -722,9 +735,28 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		}
 	}
 	
+	 private void dismissCreateGameDialog(){
+			if (this.createGameDialog != null){
+				createGameDialog.dismiss();
+				createGameDialog = null;
+			}
+		}
+
+	
 	private void setCompletedState(){
 		if (this.game.isCompleted()){
-			this.tvShortInfo.setVisibility(View.GONE);
+			this.tvShortInfo.setVisibility(View.VISIBLE);
+			 this.tvShortInfo.setText(this.getString(R.string.game_surface_game_over));
+			 this.tvNumPoints.setVisibility(View.INVISIBLE);
+			 
+			 Button bRematch = (Button) this.findViewById(R.id.bRematch);
+			 bRematch.setVisibility(View.VISIBLE);
+			 bRematch.setText(String.format(this.getString(R.string.game_surface_rematch), this.game.getOpponent().getName()));
+			 bRematch.setClickable(true);
+			 bRematch.setOnClickListener(this);
+			 this.tvCountdown.setVisibility(View.GONE);
+			 
+			 
 			
 			this.ivPlayedLetter1.setVisibility(View.GONE);
 			this.ivPlayedLetter2.setVisibility(View.GONE);
@@ -744,7 +776,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 				this.tvWinner.setText(String.format(this.getString(R.string.game_surface_opponent_winner_message), this.game.getOpponent().getName()));
 			}
 			else if(this.game.getPlayerScore() > this.game.getOpponentScore()){
-				this.tvWinner.setText(String.format(this.getString(R.string.game_surface_player_winner_message), this.player.getNumWins() + 1));
+				this.tvWinner.setText(String.format(this.getString(R.string.game_surface_player_winner_message), this.game.getWinNum()));
 			}
 			else {
 				this.tvWinner.setText(this.getString(R.string.game_surface_draw_message));
@@ -765,9 +797,6 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			this.initializeTray();
 			this.setListenerOnLists();
 		}
-	 
-		
-	 
 	}
 	
 	private void loadViews(){
@@ -784,14 +813,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.lvOpponent = (ListView)this.findViewById(R.id.lvOpponent);
 		this.lvPlayer = (ListView)this.findViewById(R.id.lvPlayer);
 		TextView tvType = (TextView)this.findViewById(R.id.tvType);
-		tvType.setText(this.getString(R.string.game_surface_dash_title));
-		if (this.game.isSpeedRoundType()){
-			tvType.setText(this.getString(R.string.game_surface_speed_rounds_title));
-		}
-		else if (this.game.isDoubleTimeType()){
-			tvType.setText(this.getString(R.string.game_surface_double_time_title));
-		}
-		
+		Button bRematch = (Button)this.findViewById(R.id.bRematch);
+		bRematch.setVisibility(View.GONE);
+		tvType.setText(this.game.getTypeTitle(this));
+		 
 		
 		this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_start));
 		if (this.game.isSpeedRoundType()){
@@ -1140,18 +1165,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			return GameSurface.getPlayedLetter_Z(context, tileSize);
 		}
 		else {
-			if (position == 6) {
-				return GameSurface.getPlayedEmpty_6(context, tileSize);
-			}
-			else if (position == 8) {
-				return GameSurface.getPlayedEmpty_8(context, tileSize);
-			}
-			else if (position == 10) {
-				return GameSurface.getPlayedEmpty_10(context, tileSize);
-			}
-			else {
-				return GameSurface.getPlayedEmpty(context, tileSize);
-			}
+			return GameSurface.getPlayedEmpty(context, tileSize);
 		}
 
  	}
@@ -1173,6 +1187,14 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	protected void onStart() {
 		Logger.d(TAG, "onStart called");
 		super.onStart();
+		EasyTracker.getInstance().activityStart(this); // Add this method.
+
+		if (this.isChartBoostActive) {
+			if (this.cb == null) {
+				this.setupChartBoost();	
+			}
+			this.cb.onStart(this);
+		}
 		
 		this.handleKickoff();
 	}
@@ -1182,10 +1204,51 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		Logger.d(TAG, "onStop called");
 		super.onStop();
 		
+		this.handlePause();
+		super.onStop();
+		 EasyTracker.getInstance().activityStop(this);
+		if (this.isChartBoostActive){
+			
+			if (this.cb.hasCachedInterstitial()){ this.cb.clearCache(); }
+			this.cb.onStop(this);
+		 
+			//this.cb = n//ull;
+		}
+
+	//	this.game = null;
+	//	this.player = null;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+
+		if (this.isChartBoostActive){
+			
+			this.cb.onDestroy(this);
+			this.cb = null;
+		}
+		
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onPause() {
+		Logger.d(TAG, "onPause called");
+		super.onPause();
+		
+		this.handlePause();
+
+	//	this.game = null;
+	//	this.player = null;
+	}
+
+
+	private void handlePause(){
 		if (this.countdown != null){
-			Logger.d(TAG, "countdown onStop called");
+			Logger.d(TAG, "countdown handlePause called");
 			if (this.game != null) {
-				Logger.d(TAG, "onStop countdown=" + this.game.getCountdown());
+				Logger.d(TAG, "handlePause countdown=" + this.game.getCountdown());
 			}
 			
 			this.countdown.cancel();
@@ -1202,14 +1265,11 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			this.autoPlayTask = null;
 		}
 		
-		if (this.game != null && !this.game.isCompleted()) {
+		if (this.game != null && !this.game.isCompleted() && this.game.isDirty()) {
 			GameService.saveGame(this.game);
 		}
-
-	//	this.game = null;
-	//	this.player = null;
 	}
-
+	
 	private void handleKickoff(){
 		Logger.d(TAG, "handleKickoff game is null " + (game == null));
 		if (this.game == null){
@@ -1436,9 +1496,67 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			    this.trackEvent(Constants.TRACKER_CATEGORY_GAMEBOARD, Constants.TRACKER_ACTION_BUTTON_TAPPED,
 	        			Constants.TRACKER_LABEL_CANCEL_CANCEL, Constants.TRACKER_DEFAULT_OPTION_VALUE);
 			    break;
+		   case Constants.RETURN_CODE_CREATE_GAME_DIALOG_CLOSE_CLICKED:
+			   this.dismissCreateGameDialog();
+			   this.trackEvent(Constants.TRACKER_CATEGORY_GAMEBOARD, Constants.TRACKER_ACTION_BUTTON_TAPPED,
+					     			Constants.TRACKER_LABEL_START_GAME_DISMISS, Constants.TRACKER_DEFAULT_OPTION_VALUE);
+			   break;
+		   case Constants.RETURN_CODE_CREATE_GAME_DIALOG_ORIGINAL_GAME_CLICKED:
+			   this.dismissCreateGameDialog();
+
+			   this.handleGameStartOnClick(this, Constants.RACE_GAME_TYPE_90_SECOND_DASH);
+			   break;
+		   case Constants.RETURN_CODE_CREATE_GAME_DIALOG_SPEED_ROUND_CLICKED:
+			   this.dismissCreateGameDialog();
+
+			   this.handleGameStartOnClick(this, Constants.RACE_GAME_TYPE_SPEED_ROUNDS);
+			   break; 
+		   case Constants.RETURN_CODE_CREATE_GAME_DIALOG_DOUBLE_TIME_CLICKED:
+			   this.dismissCreateGameDialog();
+
+			   this.handleGameStartOnClick(this, Constants.RACE_GAME_TYPE_DOUBLE_TIME);
+			   break;
+		   case Constants.RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_CANCEL_CLICKED:
+			   this.dismissCustomDialog();
+			   this.trackEvent(Constants.TRACKER_CATEGORY_GAMEBOARD, Constants.TRACKER_ACTION_BUTTON_TAPPED,
+					     			Constants.TRACKER_LABEL_HIDE_INTERSTITIAL_REMINDER_DISMISS, Constants.TRACKER_DEFAULT_OPTION_VALUE);
+			   break;
+		   case Constants.RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_CLOSE_CLICKED:
+			   this.dismissCustomDialog();
+			   this.trackEvent(Constants.TRACKER_CATEGORY_GAMEBOARD, Constants.TRACKER_ACTION_BUTTON_TAPPED,
+					     			Constants.TRACKER_LABEL_HIDE_INTERSTITIAL_REMINDER_CANCEL, Constants.TRACKER_DEFAULT_OPTION_VALUE);
+			   break;  
+		   case Constants.RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_OK_CLICKED:
+			   this.dismissCustomDialog();
+			   this.trackEvent(Constants.TRACKER_CATEGORY_GAMEBOARD, Constants.TRACKER_ACTION_BUTTON_TAPPED,
+					     			Constants.TRACKER_LABEL_HIDE_INTERSTITIAL_REMINDER_OK, Constants.TRACKER_DEFAULT_OPTION_VALUE);
+			  
+			   ((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_STORE);
+			   break; 
+    		 
 	 		}
-  
 	}
+	
+	public void handleGameStartOnClick(Context context, int type){
+    	//start game and go to game surface
+    	try {
+    		Game game = GameService.createGame(context, this.player, this.game.getOpponentId(), type);
+
+    		//finish this
+			this.trackEvent(Constants.TRACKER_ACTION_90_SECOND_GAME_STARTED,String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID, this.game.getOpponentId()), (int) Constants.TRACKER_SINGLE_VALUE);
+ 
+			((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_GAME_SURFACE);
+	 
+    		this.finish();
+			
+		} catch (DesignByContractException e) {
+			// TODO Auto-generated catch block
+			
+			DialogManager.SetupAlert(this, this.getString(R.string.sorry), e.getMessage());
+		}
+
+    }
+	
 
 	@Override
 	public void dialogClose(int resultCode, String returnValue) {
@@ -1771,8 +1889,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
-
-	 	if (v.getId() == R.id.bStart) {
+		if (v.getId() == R.id.options) {
+			if (!this.game.isStarted()){
+				popupMenu.show();
+			}
+		}
+		else if (v.getId() == R.id.bStart) {
 			this.handleStartOnClick();
 		} 
 	 	else if (v.getId() == R.id.bCancel) {
@@ -1799,7 +1921,15 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 	else if (v.getId() == R.id.bPlay){
 	 		this.handlePlay();
 	 	}
+	 	else if (v.getId() == R.id.bRematch){
+	 		this.handleRematchPrompt();
+	 	}
 
+	}
+	
+	private void handleRematchPrompt(){
+		this.createGameDialog = new CreateGameDialog(this, this.game.getOpponentId());
+    	this.createGameDialog.show();
 	}
 
 	private void loadPlayedTilesWithCurrentWord(){
@@ -2357,10 +2487,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			 		this.isChartBoostActive = true;
 			 		this.setupChartBoost();
 		 		}
-		 		else if (isAdMob){
-		 			this.isAdMobActive = true;
-		 		}
-		 	}
+ 		 	}
 		 	else{
 		 		this.hideInterstitialAd = true;
 		 	}
@@ -2369,6 +2496,55 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		 	Logger.d(TAG,  " chartBoost=" + this.isChartBoostActive);
 		}
 	
+		private void handleInterstitialAd(){
+	    	this.hasPostAdRun = false; 
+	    	if (this.hideInterstitialAd){
+	    		this.handlePostAdServer();   		            	 					
+	 			}
+	 		else{
+	 			long hoursSinceLastReminder = PlayerService.getHoursSinceLastInterstitialPurchaseReminder();
+	 			
+	 			Logger.d(TAG, "handleInterstitialAd hoursSinceLastReminder=" + hoursSinceLastReminder);
+	 			
+	 			if (hoursSinceLastReminder == Constants.DEFAULT_HIDE_AD_PURCHASE_REMINDER){
+	 				//save it for the first time
+	 				PlayerService.setLastInterstitialPurchaseReminderTime();
+	 			}
+	 			
+	 			if (hoursSinceLastReminder >= 24  ){
+	 				this.customDialog = new CustomButtonDialog(this, 
+	 		    			this.getString(R.string.game_surface_interstital_purchase_title), 
+	 		    			this.getString(R.string.game_surface_interstital_purchase_text),
+	 		    			this.getString(R.string.go_to_store),
+	 		    			this.getString(R.string.no_thanks),
+	 		    			Constants.RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_OK_CLICKED,
+	 		    			Constants.RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_CANCEL_CLICKED,
+	 		    			Constants.RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_CLOSE_CLICKED);
+	 				
+	 				//public static final int RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_OK_CLICKED = 133;	
+	 				//public static final int RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_CLOSE_CLICKED = 134;
+	 				//public static final int RETURN_CODE_CUSTOM_DIALOG_INTERSTITIAL_REMINDER_CANCEL_CLICKED = 135;	
+	 		    
+	 				PlayerService.setLastInterstitialPurchaseReminderTime();
+	 		    	this.customDialog.show();
+	 			}
+	 			else{
+		 			if (this.isChartBoostActive) {
+		 				if (spinner == null){
+		 					spinner = new CustomProgressDialog(this);
+		 		 			spinner.setMessage(this.getString(R.string.progress_almost_ready));
+		 		 			spinner.show();				
+		 				}
+		 				
+			 			this.cb.setTimeout((int)Constants.GAME_SURFACE_INTERSTITIAL_AD_CHECK_IN_MILLISECONDS);
+			 			this.cb.showInterstitial();
+				    	Logger.d(TAG, "showInterstitial from Chartboost");
+	 	 			}
+	 			}
+  			}
+	    }
+
+		
 		public void handlePostAdServer(){
 		    //	if (!this.hasPostAdRun &&  this.postTurnMessage.length() > 0){  //chartboost dismiss and close both call this, lets make sure its not run twice
 	    		 	
@@ -2376,43 +2552,14 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		    	//	this.placedResultsForWordHints.clear();
 				//	this.hints.clear();
 
-		    	//	this.hasPostAdRun = true;
+		    	this.hasPostAdRun = true;
 	    		// 	this.unfreezeButtons();
 	    		// 	Logger.d(TAG, "unfreeze handlePostAdServer");
-	    		// 	if (spinner != null) {
-	    		// 		spinner.dismiss();
-	    		// 		spinner = null;
-	    		// 	}
-	    		// 	DialogManager.SetupAlert(context, this.postTurnTitle , this.postTurnMessage);
-	    		 	
-	    		 	//lets prime the pump for the next play
-	    		 	if (this.game.isActive()){
-	    		/* 		this.preAutoplayTask = new PreAutoplayTask();
-	    		 		this.preAutoplayTask.execute();
-	    		 		
-	    		 		if(this.wordHintTask != null){
-	    		 			this.isWordHintTaskRunning = false;
-	    		 			this.wordHintTask.cancel(true);
-	    		 			this.wordHintTask = null;
-	    		 		}
-	    		 		this.wordHintTask =  new WordHintTask();
-	    		 		this.wordHintTask.execute(); */
+	    			if (spinner != null) {
+	    		 		spinner.dismiss();
+	    		 		spinner = null;
 	    		 	}
-	    		 	else if (this.game.isCompleted()){
-	    		 		//save completed event
-	    		 	/*	if (this.game.getPlayerGames().get(0).getScore() == this.game.getPlayerGames().get(1).getScore()){
-	    		 			this.trackEvent(Constants.TRACKER_ACTION_GAME_COMPLETED, String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID_DRAW, this.game.getOpponentId()), (int) Constants.TRACKER_SINGLE_VALUE);
-
-	    		 		}
-	    		 		else if (this.game.getPlayerGames().get(0).getScore() > this.game.getPlayerGames().get(1).getScore()){
-	    		 			this.trackEvent(Constants.TRACKER_ACTION_GAME_COMPLETED, String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID_LOSS, this.game.getOpponentId()), this.game.getPlayerGames().get(0).getScore() - this.game.getPlayerGames().get(1).getScore());
-
-	    		 		}
-	    		 		else {
-	    		 			this.trackEvent(Constants.TRACKER_ACTION_GAME_COMPLETED, String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID_WON, this.game.getOpponentId()), this.game.getPlayerGames().get(1).getScore() - this.game.getPlayerGames().get(0).getScore());
-
-	    		 		}*/
-	    		 	}
+ 
 		    	//}
 		    }
 		   
@@ -2460,10 +2607,35 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	   private void handleStartOnClick(){
 		 //make countdown timer a variable so that it can be killed in stop/pause
 		   //change game status to started (5)
+	   		if (this.game.isSpeedRoundType()){
+    			if (!StoreService.isSpeedRoundsPurchased(this)){
+    				PlayerService.removeAFreeUseFromSpeedRounds(this);
+    			}
+    		}
+	   		else if (this.game.isDoubleTimeType()){
+    			if (!StoreService.isDoubleTimePurchased(this)){
+    				PlayerService.removeAFreeUseFromDoubleTime(this);
+    			}
+    		}
+    		
+		   
 		   GameService.startGame(this.game);
 		   this.loadButtons();
 			
 		   //might need a start delay here at some point
+	/*	   int timerLength = this.getResources().getInteger(R.integer.gameTypeDashCountdownStart); //2 minutes
+		   if (this.game.isDoubleTimeType()){
+			   timerLength = this.getResources().getInteger(R.integer.gameTypeDoubleTimeCountdownStart);
+		   }
+		   else if(this.game.isSpeedRoundType()){
+			   timerLength = this.getResources().getInteger(R.integer.gameTypeSpeedRoundsCountdownStart);
+		   }
+		*/   
+		   this.setCountdown(this.getTimerStart());
+				
+	   }
+	   
+	   private int getTimerStart(){
 		   int timerLength = this.getResources().getInteger(R.integer.gameTypeDashCountdownStart); //2 minutes
 		   if (this.game.isDoubleTimeType()){
 			   timerLength = this.getResources().getInteger(R.integer.gameTypeDoubleTimeCountdownStart);
@@ -2471,9 +2643,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		   else if(this.game.isSpeedRoundType()){
 			   timerLength = this.getResources().getInteger(R.integer.gameTypeSpeedRoundsCountdownStart);
 		   }
-		   
-		   this.setCountdown(timerLength);
-				
+		   return timerLength;
 	   }
 	   
 	   private void setCountdown(long startingPointInMilliseconds){
@@ -2531,8 +2701,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	   
 	   private void handleCompletion(){
 		   this.isCompletedThisSession = true;
-		   GameService.completeGame(GameSurface.this.game);
+		   GameService.completeGame(this, this.player, this.game);
 		   this.setCompletedState();
+		   
+		   //handle Ad or purchase reminder
+		   this.handleInterstitialAd();
+		   
+		   
 	   }
 	   
 
@@ -2933,7 +3108,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			TextView tvWinner = (TextView)this.findViewById(R.id.tvWinner);
 			TextView tvWordsLeft = (TextView)this.findViewById(R.id.tvWordsLeft);
 			TextView tvType = (TextView)this.findViewById(R.id.tvType);
-
+			Button bRematch = (Button)this.findViewById(R.id.bRematch);
+			
 			bShuffle.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bPlay.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			bCancel.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
@@ -2944,6 +3120,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			tvWinner.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			tvWordsLeft.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			tvType.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
+			bRematch.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 			this.tvShortInfo.setTypeface(ApplicationContext.getScoreboardButtonFontTypeface());
 		}
 		

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="database_version">4</integer>
+    <integer name="free_uses_speed_rounds">15</integer>
+    <integer name="free_uses_double_time">15</integer>
+    <integer name="free_uses_word_definitions">10</integer>
  	<integer name="gameBoardLogoHeightPercentageInTenths">9</integer>
  	<integer name="maxGameBoardLogoHeight">80</integer>
  	<integer name="minWordLength">3</integer>

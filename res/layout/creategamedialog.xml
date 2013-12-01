@@ -57,6 +57,12 @@
 	     	android:id="@+id/tvDash"	
 
 	 	/>
+	     <TextView
+	        style="@style/CreateGameOption1SubTextStyle"
+	     	android:id="@+id/tvDashSubTitle"	
+	     	android:layout_below="@id/tvDash"
+
+	 	/>
     </RelativeLayout>
     
     	<RelativeLayout
@@ -70,6 +76,16 @@
 	     	android:id="@+id/tvSpeedRounds"	
 
 	 	/>
+	    <TextView
+	        style="@style/CreateGameOption2SubTextStyle"
+	     	android:id="@+id/tvSpeedRoundsSubTitle"	
+			android:layout_below="@id/tvSpeedRounds"
+	 	/>
+	     <TextView
+	        style="@style/CreateGameOption2PreviewTextStyle"
+	     	android:id="@+id/tvSpeedRoundsPreview"	
+			android:layout_below="@id/tvSpeedRoundsSubTitle"
+	 	/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_below="@id/rlSpeedRounds"
@@ -81,6 +97,16 @@
 	        style="@style/CreateGameBottomOptionTextStyle"
 	     	android:id="@+id/tvDoubleTime"	
 
+	 	/>
+	    <TextView
+	        style="@style/CreateGameBottomOptionSubTextStyle"
+	     	android:id="@+id/tvDoubleTimeSubTitle"	
+			android:layout_below="@id/tvDoubleTime"
+	 	/>
+	     <TextView
+	        style="@style/CreateGameBottomOptionPreviewTextStyle"
+	     	android:id="@+id/tvDoubleTimePreview"	
+			android:layout_below="@id/tvDoubleTimeSubTitle"
 	 	/>
     </RelativeLayout>
     	    	

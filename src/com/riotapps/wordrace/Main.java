@@ -5,6 +5,7 @@ import com.riotapps.wordrace.hooks.Game;
 import com.riotapps.wordbase.hooks.Opponent;
 import com.riotapps.wordbase.hooks.OpponentService;
 import com.riotapps.wordbase.hooks.Player;
+import com.riotapps.wordbase.hooks.StoreService;
 import com.riotapps.wordrace.hooks.GameService;
 import com.riotapps.wordrace.ui.CreateGameDialog;
 import com.riotapps.wordbase.ui.CustomButtonDialog;
@@ -89,7 +90,7 @@ public class Main extends com.riotapps.wordbase.Main {
     	//start game and go to game surface
     	try {
     		
-    		
+ 
 			Game game = GameService.createGame(context, super.player, this.opponentId, type);
 
 			super.trackEvent(Constants.TRACKER_ACTION_90_SECOND_GAME_STARTED,String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID, opponentId), (int) Constants.TRACKER_SINGLE_VALUE);

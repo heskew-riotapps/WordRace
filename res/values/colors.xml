@@ -10,6 +10,7 @@
     <color name="word_list_area_player_background">#fff5ee</color> 
     <color name="word_list_area_background">#cada39</color> 
     <color name="button_area_background">#ee5b92</color> 
+    <color name="played_word_area_background">#BA55D3</color> <!-- B23AEE -->
     <color name="scoreboard_background">#e03b7d</color> <!-- d42931 ae1d18 CD96CD DB70DB 024bc4 137ccd 64908A -->
     <color name="tray_background">#29cdf0</color>
 	<color name="button_text_color_on">#fff5ee</color>
@@ -58,10 +59,10 @@
     <color name="create_game_bottom_option_background">#ee5b92</color>
     <color name="create_game_bottom_option_pressed">#D3D3D3</color>
     <color name="create_game_bottom_option_text">#ffffff</color>
-    <color name="create_game_option_1_background">#cada39</color>
+    <color name="create_game_option_1_background">#BA55D3</color><!-- cada39 -->
     <color name="create_game_option_1_pressed">#D3D3D3</color>
     <color name="create_game_option_1_text">#ffffff</color>
-     <color name="create_game_option_2_background">#29cdf0</color>
+     <color name="create_game_option_2_background">#ff6501</color> <!-- 29cdf0 -->
     <color name="create_game_option_2_pressed">#D3D3D3</color>
     <color name="create_game_option_2_text">#ffffff</color>
     <color name="game_type_text_background">#e03b7d</color><!--e03b7d -->

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.riotapps.wordbase.hooks.Opponent;
 import com.riotapps.wordbase.hooks.OpponentService;
+import com.riotapps.wordbase.hooks.PlayerService;
 import com.riotapps.wordbase.hooks.StoreService;
 import com.riotapps.wordbase.interfaces.ICloseDialog;
 
@@ -95,21 +96,60 @@ public class CreateGameDialog extends AlertDialog{
 		TextView tvDash = (TextView) layout.findViewById(R.id.tvDash);
 		tvDash.setTypeface(ApplicationContext.getMainFontTypeface());
 		tvDash.setText(context.getString(R.string.create_game_dash_title));
+		TextView tvDashSubTitle = (TextView) layout.findViewById(R.id.tvDashSubTitle);
+		tvDashSubTitle.setTypeface(ApplicationContext.getMainFontTypeface());
+		tvDashSubTitle.setText(context.getString(R.string.create_game_dash_sub_title));
 		
 		rlDash.setClickable(true);
 		
 		RelativeLayout rlSpeedRounds = (RelativeLayout) layout.findViewById(R.id.rlSpeedRounds);
 		TextView tvSpeedRounds = (TextView) layout.findViewById(R.id.tvSpeedRounds);
 		tvSpeedRounds.setTypeface(ApplicationContext.getMainFontTypeface());
-		tvSpeedRounds.setText(context.getString(R.string.create_game_speed_rounds_title) + StoreService.getCachedInventoryItemPrice(context.getString(R.string.SKU_GOOGLE_PLAY_SPEED_ROUNDS)));
-		
+		tvSpeedRounds.setText(context.getString(R.string.create_game_speed_rounds_title));
+		TextView tvSpeedRoundsSubTitle = (TextView) layout.findViewById(R.id.tvSpeedRoundsSubTitle);
+		tvSpeedRoundsSubTitle.setTypeface(ApplicationContext.getMainFontTypeface());
+		tvSpeedRoundsSubTitle.setText(context.getString(R.string.create_game_speed_rounds_sub_title));
+		TextView tvSpeedRoundsPreview = (TextView) layout.findViewById(R.id.tvSpeedRoundsPreview);
+		tvSpeedRoundsPreview.setTypeface(ApplicationContext.getMainFontTypeface());
+		if (!StoreService.isSpeedRoundsPurchased(this.context)){
+			int remainingSpeedRoundsPreviews = PlayerService.getRemainingFreeUsesSpeedRounds(this.context);
+			String speedRoundPrice = StoreService.getCachedInventoryItemPrice(context.getString(R.string.SKU_GOOGLE_PLAY_SPEED_ROUNDS));
+			if (remainingSpeedRoundsPreviews > 0) {
+				tvSpeedRoundsPreview.setText(String.format(context.getString(R.string.create_game_speed_rounds_previews_remaining),remainingSpeedRoundsPreviews, speedRoundPrice));
+			}
+			else {
+				//tap goes to store
+				tvSpeedRoundsPreview.setText(String.format(context.getString(R.string.create_game_speed_rounds_previews_gone), speedRoundPrice));
+			}
+		}
+		else{
+			tvSpeedRoundsPreview.setVisibility(View.GONE);
+		}
+
 		rlSpeedRounds.setClickable(true);
 		
 		RelativeLayout rlDoubleTime = (RelativeLayout) layout.findViewById(R.id.rlDoubleTime);
 		TextView tvDoubleTime = (TextView) layout.findViewById(R.id.tvDoubleTime);
 		tvDoubleTime.setTypeface(ApplicationContext.getMainFontTypeface());
-		tvDoubleTime.setText(context.getString(R.string.create_game_double_time_title) + StoreService.getCachedInventoryItemPrice(context.getString(R.string.SKU_GOOGLE_PLAY_DOUBLE_TIME)));
-		
+		tvDoubleTime.setText(context.getString(R.string.create_game_double_time_title));
+		TextView tvDoubleTimeSubTitle = (TextView) layout.findViewById(R.id.tvDoubleTimeSubTitle);
+		tvDoubleTimeSubTitle.setTypeface(ApplicationContext.getMainFontTypeface());
+		tvDoubleTimeSubTitle.setText(context.getString(R.string.create_game_double_time_sub_title));
+		TextView tvDoubleTimePreview = (TextView) layout.findViewById(R.id.tvDoubleTimePreview);
+		tvDoubleTimePreview.setTypeface(ApplicationContext.getMainFontTypeface());
+		if (!StoreService.isDoubleTimePurchased(this.context)){
+			int remainingDoubleTimePreviews = PlayerService.getRemainingFreeUsesDoubleTime(this.context);
+			String doubleTimePrice = StoreService.getCachedInventoryItemPrice(context.getString(R.string.SKU_GOOGLE_PLAY_DOUBLE_TIME));
+			if (remainingDoubleTimePreviews > 0) {
+				tvDoubleTimePreview.setText(String.format(context.getString(R.string.create_game_double_time_previews_remaining),remainingDoubleTimePreviews, doubleTimePrice));
+			}
+			else {
+				tvDoubleTimePreview.setText(String.format(context.getString(R.string.create_game_double_time_previews_gone), doubleTimePrice));
+			}
+		}
+		else{
+			tvDoubleTimePreview.setVisibility(View.GONE);
+		}
 		rlDoubleTime.setClickable(true);
 		
 		//this.bOK = (Button) layout.findViewById(R.id.bOK);

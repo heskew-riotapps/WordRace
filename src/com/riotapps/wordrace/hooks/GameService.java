@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.riotapps.wordbase.R;
 import com.riotapps.wordrace.hooks.Game;
 import com.riotapps.wordbase.hooks.AlphabetService;
+import com.riotapps.wordbase.hooks.CompletedGame;
 import com.riotapps.wordbase.hooks.GameListItem;
 import com.riotapps.wordbase.hooks.Opponent;
 import com.riotapps.wordbase.hooks.OpponentService;
@@ -104,16 +105,17 @@ public class GameService {
     	 
 	}
 	
-	public static void completeGame(Game game){
+	public static void completeGame(Context context, Player player, Game game){
 		 
-		Player player = PlayerService.getPlayer();
+		//Player player = PlayerService.getPlayer();
     	//add 1 to opponent's wins, save opponent 
     	//add 1 to player's losses, save player
     	player.setActiveGameId(Constants.EMPTY_STRING);
     	
     	if (game.getPlayerScore() > game.getOpponentScore()){
         	player.setNumWins(player.getNumWins() + 1);
-        	game.getOpponent().addLossToRecord();   		
+        	game.getOpponent().addLossToRecord(); 
+        	game.setWinNum(player.getNumWins());
     	}
     	else if (game.getOpponentScore() > game.getPlayerScore()){
         	player.setNumLosses(player.getNumLosses() + 1);
@@ -130,17 +132,19 @@ public class GameService {
     	game.setStatus(3); //sets up enum for game status and playerGame status
      	
     	saveGame(game);
-    	addGameToCompletedList(game);
+    	addGameToCompletedList(context, game);
 				
 	}
 	
 	public static void saveGame(Game game){
 		//game.getPlayerGames().get(1).getPlacedResults().clear();
 		GameData.saveGame(game);
+		game.setDirty(false);
 	}	
 	
 	public static void startGame(Game game){
 		game.setStatus(5);
+		game.setCountdown(1);
 		saveGame(game);
 	}
 	
@@ -405,19 +409,32 @@ public class GameService {
 	}
 	
   	
-	public static void addGameToCompletedList(Game game){
-		 List<GameListItem> games = GameData.getCompletedGameList();
+	public static void addGameToCompletedList(Context context, Game game){
+		 List<CompletedGame> games = GameData.getCompletedGameList();
+		 //List<GameListItem> games = GameData.getCompletedGameList();
 		 
 		 Logger.d(TAG, "addGameToCompletedList size=" + games.size() + " " + Constants.NUM_LOCAL_COMPLETED_GAMES_TO_STORE);
 		 
 		 //put game at the beginning so that it saves in descending order
-		 games.add(0, new  GameListItem(game.getId(), game.getCreateDate()));
+		 CompletedGame completed = new CompletedGame();
+		 completed.setId(game.getId());
+		 completed.setCompletedDate(new Date()); //game.getCreateDate());
+		 completed.setGameType(game.getTypeTitle(context));
+		 completed.setOpponentImageResourceId(game.getOpponent().getSmallResourceId());
+		 completed.setOpponentName(game.getOpponent().getName());
+		 completed.setOpponentScore(game.getOpponentScore());
+		 completed.setOpponentSkillLevel(game.getOpponent().getSkillLevelText(context));
+		 completed.setPlayerScore(game.getPlayerScore());
+		 
+		// games.add(0, new  GameListItem(game.getId(), game.getCreateDate()));
+		 
+		 games.add(0, completed);
 		 
 		 //only store 10 games in this list.  clean out game storage and list for 11 and above
 		 if (games.size() > Constants.NUM_LOCAL_COMPLETED_GAMES_TO_STORE){
 			 for (int i = games.size() - 1; i > Constants.NUM_LOCAL_COMPLETED_GAMES_TO_STORE - 1; i--){
 				 
-				 removeGame(games.get(i).getGameId());
+				 removeGame(games.get(i).getId());
 				 games.remove(i);
 			 }
 			 
@@ -427,9 +444,9 @@ public class GameService {
 		 GameData.saveCompletedGameList(games);
 	}
 	
-	public static List<Game> getCompletedGames(){
-		 List<GameListItem> games = GameData.getCompletedGameList();
-		 List<Game> gameList = new ArrayList<Game>();
+	public static List<CompletedGame> getCompletedGames(){
+		 return GameData.getCompletedGameList();
+		 /*List<Game> gameList = new ArrayList<Game>();
 		 
 		 for (GameListItem gli : games){
 			 try{
@@ -441,6 +458,7 @@ public class GameService {
 		 }
  		 
 		 return gameList;
+		 */
 	}
 	
 }
