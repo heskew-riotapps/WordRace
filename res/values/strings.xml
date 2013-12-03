@@ -157,10 +157,10 @@
 	 <string name="create_game_dash_sub_title_purchased">The 90 second sprint!  Buckle up!</string>
 	 <string name="create_game_speed_rounds_sub_title">Three breathless 45 second sprints!</string>
 	 <string name="create_game_speed_rounds_previews_remaining">(%1$s free left.  %2$s for unlimited usage)</string>
-	 <string name="create_game_speed_rounds_previews_gone">Only %s for unlimited usage. Tap to go to store for upgrade.</string>
+	 <string name="create_game_speed_rounds_previews_gone">Only %s for unlimited usage.</string>
 	 <string name="create_game_double_time_sub_title">The 3 minute marathon!</string>
 	 <string name="create_game_double_time_previews_remaining">(%1$s free left.  %2$s for unlimited usage)</string>
-	 <string name="create_game_double_time_previews_gone">Only %s for unlimited usage. Tap to go to store for upgrade.</string>
+	 <string name="create_game_double_time_previews_gone">Only %s for unlimited usage.</string>
 	 
 	 
 	 <string name="game_surface_dash_title">Fast Dash</string>
@@ -179,4 +179,8 @@
 	 <string name="game_surface_game_over">Game Over</string>
 	 <string name="game_surface_interstital_purchase_title">get rid of ads?</string>
 	 <string name="game_surface_interstital_purchase_text">Want to get rid of ads between games?  No problem.  Just get a Premium Upgrade or a No Ads Between Games Upgrade.</string>
+
+	 <string name="game_surface_start_game_ready">ready&#8230;</string>
+	 <string name="game_surface_start_game_set">set&#8230;</string>
+	 <string name="game_surface_start_game_go">GO!!!</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
      android:id="@+id/root"
-    style="@style/DialogStyle"
+    style="@style/CreateGameDialogStyle"
     android:background="@drawable/dialog_background"
 	>
  <RelativeLayout  
@@ -32,22 +32,35 @@
         android:layout_alignParentRight="true"
         android:paddingRight="3dp"
         android:paddingTop="3dp"
+       
+		/>
+    <ImageView
+        android:id="@+id/ivOpponent"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/alert_title"
+        android:paddingRight="3dp"
+        android:paddingTop="3dp"
+        android:layout_marginTop="10dp"
 		/>
     <TextView
         style="@style/TextLargeStyle"
+        android:textSize="16sp"
      	android:id="@+id/alert_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@id/ivOpponent"
         android:paddingLeft="20.0dip"
         android:paddingRight="20.0dip"
         android:layout_below="@id/alert_title"
- 		android:layout_marginTop="10dp"  
- 		android:layout_marginBottom="10dp"  
+ 		android:layout_marginTop="5dp"  
+
  		
  	/>
 	<RelativeLayout
-        android:layout_below="@id/alert_text"
+        android:layout_below="@id/ivOpponent"
         style="@style/CreateGameOption1AreaStyle"
         android:id="@+id/rlDash"
  

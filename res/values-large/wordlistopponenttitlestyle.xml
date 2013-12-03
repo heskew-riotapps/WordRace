@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="WordListOpponentTitleStyle" >
+   		<item name="android:paddingTop">2dp</item>
+   		<item name="android:paddingBottom">2dp</item>
+   	   	<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+ 		<item name="android:includeFontPadding">false</item>
+		<item name="android:gravity">center</item>   -
+		<item name="android:textColor">@color/word_list_area_opponent_title_text</item>
+		<item name="android:background">@color/word_list_area_opponent_title_background</item>
+		<item name="android:textSize">16sp</item>
+	</style>
+</resources>	   
+		    

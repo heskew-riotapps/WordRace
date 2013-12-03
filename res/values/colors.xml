@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+    <color name="top_area_background">#29cdf0</color><!-- 177efe -->
+    <color name="gameboard_bottom_ad_background">#2a2a2a</color>
+    <color name="gameboard_bottom_fill_background">#e03b7d</color>
     <color name="word_list_area_middle_border">#A020F0</color> <!-- 670099 -->
     <color name="word_list_area_player_title_text">#ffffff</color>
     <color name="word_list_area_opponent_title_text">#ffffff</color>
@@ -11,6 +13,7 @@
     <color name="word_list_area_background">#cada39</color> 
     <color name="button_area_background">#ee5b92</color> 
     <color name="played_word_area_background">#BA55D3</color> <!-- B23AEE -->
+        <color name="game_complete_area_background">#BA55D3</color> <!-- B23AEE -->
     <color name="scoreboard_background">#e03b7d</color> <!-- d42931 ae1d18 CD96CD DB70DB 024bc4 137ccd 64908A -->
     <color name="tray_background">#29cdf0</color>
 	<color name="button_text_color_on">#fff5ee</color>

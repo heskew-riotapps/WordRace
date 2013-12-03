@@ -5,6 +5,7 @@ import com.riotapps.wordrace.hooks.Game;
 import com.riotapps.wordbase.hooks.Opponent;
 import com.riotapps.wordbase.hooks.OpponentService;
 import com.riotapps.wordbase.hooks.Player;
+import com.riotapps.wordbase.hooks.PlayerService;
 import com.riotapps.wordbase.hooks.StoreService;
 import com.riotapps.wordrace.hooks.GameService;
 import com.riotapps.wordrace.ui.CreateGameDialog;
@@ -89,12 +90,26 @@ public class Main extends com.riotapps.wordbase.Main {
 	public void handleGameStartOnClick(Context context, int type){
     	//start game and go to game surface
     	try {
-    		
- 
+    		if (type == Constants.RACE_GAME_TYPE_DOUBLE_TIME && !StoreService.isDoubleTimePurchased(this) && PlayerService.getRemainingFreeUsesDoubleTime(this) < 1){
+    			((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_STORE);
+    			return;
+    		}
+    		else if (type == Constants.RACE_GAME_TYPE_SPEED_ROUNDS && !StoreService.isSpeedRoundsPurchased(this) && PlayerService.getRemainingFreeUsesSpeedRounds(this) < 1){
+   			 	((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_STORE);
+   			 	return;
+    		}
+
 			Game game = GameService.createGame(context, super.player, this.opponentId, type);
 
-			super.trackEvent(Constants.TRACKER_ACTION_90_SECOND_GAME_STARTED,String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID, opponentId), (int) Constants.TRACKER_SINGLE_VALUE);
- 
+    		if (type == Constants.RACE_GAME_TYPE_DOUBLE_TIME){
+    			super.trackEvent(Constants.TRACKER_ACTION_DOUBLE_TIME_GAME_STARTED,String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID, game.getOpponentId()), (int) Constants.TRACKER_SINGLE_VALUE);
+    		}
+    		else if (type == Constants.RACE_GAME_TYPE_SPEED_ROUNDS){
+    			super.trackEvent(Constants.TRACKER_ACTION_SPEED_ROUNDS_GAME_STARTED,String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID, game.getOpponentId()), (int) Constants.TRACKER_SINGLE_VALUE);
+    		}
+    		else if (type == Constants.RACE_GAME_TYPE_90_SECOND_DASH){
+    			super.trackEvent(Constants.TRACKER_ACTION_90_SECOND_GAME_STARTED,String.format(Constants.TRACKER_LABEL_OPPONENT_WITH_ID, game.getOpponentId()), (int) Constants.TRACKER_SINGLE_VALUE);
+    		} 
 			((ApplicationContext)this.getApplication()).startNewActivity(this, Constants.ACTIVITY_CLASS_GAME_SURFACE);
 	 
     		this.finish();

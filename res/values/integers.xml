@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="database_version">4</integer>
-    <integer name="free_uses_speed_rounds">15</integer>
+    <integer name="free_uses_speed_rounds">20</integer>
     <integer name="free_uses_double_time">15</integer>
     <integer name="free_uses_word_definitions">10</integer>
  	<integer name="gameBoardLogoHeightPercentageInTenths">9</integer>
@@ -22,4 +22,5 @@
  	<integer name="gameTypeDashCountdownStart">90000</integer>
  	<integer name="gameTypeDoubleTimeCountdownStart">180000</integer>
  	<integer name="gameTypeSpeedRoundsCountdownStart">45000</integer>
+ 	<integer name="maxTrayTileSize">110</integer>
 </resources>

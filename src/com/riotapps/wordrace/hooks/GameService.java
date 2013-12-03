@@ -145,7 +145,7 @@ public class GameService {
 	public static void startGame(Game game){
 		game.setStatus(5);
 		game.setCountdown(1);
-		saveGame(game);
+	//	saveGame(game);
 	}
 	
 	public static void removeGame(String gameId){

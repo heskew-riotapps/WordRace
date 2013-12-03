@@ -80,9 +80,12 @@ public class CreateGameDialog extends AlertDialog{
 		Opponent o = OpponentService.getOpponent(this.opponentId);
         
 		TextView title = (TextView) layout.findViewById(R.id.alert_title);  
+		ImageView ivOpponent = (ImageView) layout.findViewById(R.id.ivOpponent);  
 		title.setTypeface(ApplicationContext.getMainFontTypeface());
 		title.setText(this.context.getString(R.string.main_game_start_prompt_title)); //create a game
 
+		ivOpponent.setBackgroundResource(o.getSmallResourceId());
+		
 		TextView text = (TextView) layout.findViewById(R.id.alert_text);
 		text.setTypeface(ApplicationContext.getMainFontTypeface());
 		text.setText(String.format(this.context.getString(R.string.main_game_start_prompt), o.getName(), o.getSkillLevelTextLCase(this.context)));
