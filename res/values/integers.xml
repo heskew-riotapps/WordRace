@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="database_version">4</integer>
-    <integer name="free_uses_speed_rounds">20</integer>
+    <integer name="free_uses_speed_rounds">15</integer>
     <integer name="free_uses_double_time">15</integer>
-    <integer name="free_uses_word_definitions">10</integer>
+    <integer name="free_uses_word_definitions">15</integer>
  	<integer name="gameBoardLogoHeightPercentageInTenths">9</integer>
  	<integer name="maxGameBoardLogoHeight">80</integer>
  	<integer name="minWordLength">3</integer>
- 	<integer name="skillLevelNoviceMinDelay">2000</integer>
- 	<integer name="skillLevelNoviceMaxDelay">11000</integer>
- 	<integer name="skillLevelAmateurMinDelay">1800</integer>
- 	<integer name="skillLevelAmateurMaxDelay">10000</integer>
- 	<integer name="skillLevelSemiProMinDelay">1500</integer>
- 	<integer name="skillLevelSemiProMaxDelay">9000</integer>
- 	<integer name="skillLevelProfessionalMinDelay">1100</integer>
- 	<integer name="skillLevelProfessionalMaxDelay">8000</integer>
- 	<integer name="skillLevelExpertMinDelay">1000</integer>
- 	<integer name="skillLevelExpertMaxDelay">7000</integer>
- 	<integer name="skillLevelMasterMinDelay">800</integer>
+ 	<integer name="skillLevelNoviceMinDelay">1000</integer>
+ 	<integer name="skillLevelNoviceMaxDelay">8500</integer>
+ 	<integer name="skillLevelAmateurMinDelay">900</integer>
+ 	<integer name="skillLevelAmateurMaxDelay">8000</integer>
+ 	<integer name="skillLevelSemiProMinDelay">850</integer>
+ 	<integer name="skillLevelSemiProMaxDelay">7500</integer>
+ 	<integer name="skillLevelProfessionalMinDelay">800</integer>
+ 	<integer name="skillLevelProfessionalMaxDelay">7000</integer>
+ 	<integer name="skillLevelExpertMinDelay">750</integer>
+ 	<integer name="skillLevelExpertMaxDelay">6500</integer>
+ 	<integer name="skillLevelMasterMinDelay">700</integer>
  	<integer name="skillLevelMasterMaxDelay">6000</integer>
  	<integer name="gameTypeDashCountdownStart">90000</integer>
  	<integer name="gameTypeDoubleTimeCountdownStart">180000</integer>

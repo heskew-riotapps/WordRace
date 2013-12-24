@@ -1,3 +1,4 @@
 <resources>
 	<string name="game_surface_rematch">rematch with %s</string>
+	<string name="game_surface_race_lookup_definition">tap any word to look up it\'s definition</string>
 </resources>

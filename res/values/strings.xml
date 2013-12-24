@@ -37,7 +37,7 @@
 	<string name="main_first_time_alert_title">Welcome!</string>
 	<string name="main_first_time_alert_message">To get started, just choose a monster to play.  Check out all of the rules or visit the store by tapping the 3 squares in the top right corner.\n\nEnjoy Race With Enemies!\n\nThe monsters are waiting.</string>
 	 	
-	 <string name="game_surface_first_time_alert_title">Good luck!</string>
+	 <string name="game_surface_first_time_alert_title">Get Ready!</string>
 	 <string name="game_surface_first_time_alert_message">Drag letters from the tray onto the board to form words in a single axis.\n\nThe first word must be played on at least one star.\n\nLetters can be played on top of previously played letters.</string>
 		
 	 <string name="purchase_thanks_speed_rounds">We hope you enjoy your unlimited usage of Speed Rounds!</string>	
@@ -57,7 +57,7 @@
     <string name="store_item_speed_rounds_title">Speed Rounds</string>
 	<string name="store_item_speed_rounds_description">The Fast Dash game length is 90 seconds.  With the Speed Rounds upgrade, you will be able to choose to play games that consist of three 45-second rounds instead!  Unlimited usage.</string>	
 	<string name="store_item_double_time_title">Double Time</string>
-	<string name="store_item_double_time_description">Choose to double the time of time for a game.  Double Time games last 3 minutes!  Can you last that long against the monsters??  Unlimited games.</string>
+	<string name="store_item_double_time_description">Choose to double the time of a game.  Double Time games last 3 minutes!  Can you last that long against the monsters??  Unlimited games.</string>
 		<string name="share_subject">Words With Enemies</string>
 		<string name="share_message">Check out Words With Enemies for Android in the Google Play store.  Test your crossword skills against some super smart monsters.  Always play at your own pace, as fast as you desire.</string>
 	<string name="about_main">Race With Enemies by RiotApps</string>
@@ -67,7 +67,7 @@
 	<string name="about_support">Need support? Have comments? Want to report a bug?</string>	 
 	<string name="about_support_link">http://racewithenemies.uservoice.com/</string>	 
 	<string name="about_fb_like">Please like us on Facebook</string>	
-	<string name="about_fb_link">https://www.facebook.com/pages/Race-With-Enemies/560080617380480</string>	
+	<string name="about_fb_link">https://www.facebook.com/racewithenemies</string>	
 	
 	<string name="main_menu_about">About Race With Enemies</string>
 	
@@ -95,7 +95,7 @@
  	<string name="scoreboard_1_word_left">1 word left</string>
  	<string name="scoreboard_countdown_start">1:30</string>
  	<string name="scoreboard_countdown_double_time_start">3:00</string>
- 	<string name="scoreboard_countdown_spped_round_start">0:45</string>
+ 	<string name="scoreboard_countdown_speed_round_start">0:45</string>
  	<string name="scoreboard_countdown">%1$s:%2$s</string>
  	<string name="scoreboard_countdown_completed">0:00</string>
  	
@@ -138,7 +138,7 @@
 	 <string name="game_surface_race_word_already_played">you have already played %1$s</string> 
 	 <string name="game_surface_race_word_invalid">%s is not a valid word</string>
 	 
-	 <string name="game_surface_race_lookup_definition">tap any word to look up it\'s definition</string>
+	 <string name="game_surface_race_lookup_definition">tap any word to look\nup it\'s definition</string>
 	 <string name="game_surface_opponent_winner_message">%s won!</string>
 	 <string name="game_surface_player_winner_message">You won!\nWin #%s!</string>	 
 	 <string name="game_surface_draw_message">It\'s a draw!</string>
@@ -183,4 +183,7 @@
 	 <string name="game_surface_start_game_ready">ready&#8230;</string>
 	 <string name="game_surface_start_game_set">set&#8230;</string>
 	 <string name="game_surface_start_game_go">GO!!!</string>
+	 <string name="game_surface_first_time_alert_message">Tap START to begin the game.  Tap (don\'t drag) the letters in your tray to
+form a word.  Tap the PLAY button when you
+have created your word.  Do this as many times as you can...but do it quickly!\n\nRemember, you\'re racing the clock AND your opponent!</string>
 </resources>

@@ -144,6 +144,7 @@ public class GameService {
 	
 	public static void startGame(Game game){
 		game.setStatus(5);
+		game.setNumWordsPlayedThisRound(0);
 		game.setCountdown(1);
 	//	saveGame(game);
 	}

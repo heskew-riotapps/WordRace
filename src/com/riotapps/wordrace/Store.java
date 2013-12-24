@@ -1,5 +1,6 @@
 package com.riotapps.wordrace;
 
+import com.google.ads.AdRequest;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
 import com.riotapps.wordbase.billing.IabHelper;
@@ -13,6 +14,7 @@ import com.riotapps.wordbase.ui.MenuUtils;
 import com.riotapps.wordbase.utils.ApplicationContext;
 import com.riotapps.wordbase.utils.Constants;
 import com.riotapps.wordbase.utils.Logger;
+import com.riotapps.wordbase.utils.NetworkConnectivity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class Store  extends FragmentActivity implements View.OnClickListener{
@@ -52,16 +55,31 @@ public class Store  extends FragmentActivity implements View.OnClickListener{
 	        MenuUtils.setHeaderTitle(this, this.getString(R.string.header_title_store));
 	        this.setupFonts();
 	        
-	        // compute your public key and store it in base64EncodedPublicKey
-	        mHelper = new IabHelper(this, StoreService.getIABPublicKey(this));
-	        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-	        	   public void onIabSetupFinished(IabResult result) {
-	        	                
-	        	         // Hooray, IAB is fully set up!
-	        	      Logger.d(TAG, "In-app Billing is ready to go...almost ");
-	        	      onSetupFinished(result);
-	        	   }
-	        	});
+	        NetworkConnectivity connection = new NetworkConnectivity(this);
+    		boolean isConnected = connection.checkNetworkConnectivity();
+    		
+    		if (isConnected){
+    			 // compute your public key and store it in base64EncodedPublicKey
+    	        mHelper = new IabHelper(this, StoreService.getIABPublicKey(this));
+    	        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+    	        	   public void onIabSetupFinished(IabResult result) {
+    	        	                
+    	        	         // Hooray, IAB is fully set up!
+    	        	      Logger.d(TAG, "In-app Billing is ready to go...almost ");
+    	        	      onSetupFinished(result);
+    	        	   }
+    	        	});
+    		}
+    		else{
+    			TextView tvNotConnected = (TextView)this.findViewById(R.id.tvNotConnected);
+    			tvNotConnected.setTypeface(ApplicationContext.getMainFontTypeface());
+    			tvNotConnected.setText(String.format(this.getString(R.string.store_not_connected), this.getString(R.string.app_name)));
+    			ScrollView svStore = (ScrollView)this.findViewById(R.id.svStore);
+    			svStore.setVisibility(View.GONE);
+    			tvNotConnected.setVisibility(View.VISIBLE);
+    		}
+	        
+	       
 	        
 	 }
 	  @Override

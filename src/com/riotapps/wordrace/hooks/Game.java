@@ -49,6 +49,9 @@ public class Game {
 	@SerializedName("n_w")
 	private int numPossibleWords;
 	
+	@SerializedName("n_wpr")
+	private int numWordsPlayedThisRound = 0;
+	
 	@SerializedName("g_t")
 	private int gameType = 0;
 
@@ -236,4 +239,14 @@ public class Game {
 		else if (this.isSpeedRoundType()){ return context.getString(R.string.game_surface_speed_rounds_title); }
 		else { return context.getString(R.string.game_surface_double_time_title); }
  	}
+	public int getNumWordsPlayedThisRound() {
+		return numWordsPlayedThisRound;
+	}
+	public void setNumWordsPlayedThisRound(int numWordsPlayedThisRound) {
+		this.numWordsPlayedThisRound = numWordsPlayedThisRound;
+	}
+	public void incrementNumWordsPlayedThisRound() {
+		this.numWordsPlayedThisRound += 1;
+	}
+	
 }

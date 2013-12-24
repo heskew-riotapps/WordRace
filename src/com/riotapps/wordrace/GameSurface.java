@@ -584,10 +584,18 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.handleKickoff();
 		
 		this.setupAdServer();
-
+		this.checkFirstTimeStatus();
 	 //	this.setupPreloadTask();
 	}
 	
+	 private void checkFirstTimeStatus(){
+		 //first check to see if this score has already been alerted (from local storage) 
+		 
+		 if (!PlayerService.checkFirstTimeGameSurfaceAlertAlreadyShown(this)) {
+			 DialogManager.SetupAlert(this, this.getString(R.string.game_surface_first_time_alert_title), this.getString(R.string.game_surface_first_time_alert_message));
+		 }
+		 
+	 }
 	private void setStartState(){
 		//if the game was stopped before completion
 		
@@ -750,14 +758,16 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			this.tvShortInfo.setVisibility(View.VISIBLE);
 			 this.tvShortInfo.setText(this.getString(R.string.game_surface_game_over));
 			 this.tvNumPoints.setVisibility(View.INVISIBLE);
-			 
+ 		 
 			 Button bRematch = (Button) this.findViewById(R.id.bRematch);
 			 bRematch.setVisibility(View.VISIBLE);
 			 bRematch.setText(String.format(this.getString(R.string.game_surface_rematch), this.game.getOpponent().getName()));
 			 bRematch.setClickable(true);
 			 bRematch.setOnClickListener(this);
 			 this.tvCountdown.setVisibility(View.GONE);
+	 	 
 			 
+			// GameSurface.this.runOnUiThread(new handleCountdownViewState(0));
 			 LinearLayout llPlayedWord = (LinearLayout) this.findViewById(R.id.llPlayedWord);
 			 RelativeLayout llGameComplete = (RelativeLayout) this.findViewById(R.id.llGameComplete);
 			 llPlayedWord.setVisibility(View.GONE);
@@ -840,7 +850,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		
 		this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_start));
 		if (this.game.isSpeedRoundType()){
-			this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_spped_round_start));
+			this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_speed_round_start));
 		}
 		else if (this.game.isDoubleTimeType()){
 			this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_double_time_start));
@@ -1444,9 +1454,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 					//save game to save the total number of possibilities
 					// if (GameSurface.this.game.getNumPossibleWords() == 0){
 						 GameSurface.this.game.setNumPossibleWords(GameSurface.this.possibleWords.size());
+						 
 						 GameService.saveGame(GameSurface.this.game);
 			//	GameSurface.this.autoPlay();
-						 
+			//			 TextView tvWordsLeft = (TextView)GameSurface.this.findViewById(com.riotapps.wordrace.R.id.tvWordsLeft); 
+						  
+			//			 tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), GameSurface.this.possibleWords.size()));
+				 
 			}
 	    	 
 	    	 return null;
@@ -1459,20 +1473,24 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	     protected void onPostExecute(Void param) {
 			 Logger.d(GameSurface.TAG, "PreLoadTask onPostExecute called");
 	    //	 if (GameSurface.this.game.isActive()){
-	    		 TextView tvWordsLeft = (TextView)GameSurface.this.findViewById(com.riotapps.wordrace.R.id.tvWordsLeft); 
-		  
-					 tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), GameSurface.this.game.getNumPossibleWords() - GameSurface.this.game.getPlayedWords().size()));
-			 
+			 if (GameSurface.this.game.isActive() || GameSurface.this.game.isStarted() ){  
+				 TextView tvWordsLeft = (TextView)GameSurface.this.findViewById(com.riotapps.wordrace.R.id.tvWordsLeft); 
+				 tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), GameSurface.this.game.getNumPossibleWords() - GameSurface.this.game.getNumWordsPlayedThisRound()));
+			 }			 
 	    	// }
 	    	 if (GameSurface.this.spinner != null){
 	    		 GameSurface.this.spinner.dismiss();
 	    		 GameSurface.this.spinner = null;
 	 		}
 			
+	    	// if (GameSurface.this.game.isSpeedRoundType() && (GameSurface.this.game.getRound() == 2 || GameSurface.this.game.getRound() == 3)){
+	    	//	 GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_speed_round_start));
+	    	//	 GameSurface.this.runOnUiThread(new handleCountdownViewState(GameSurface.this.game.getRound()));
+	    	 //}
+	    	 
 	    	 GameSurface.this.setStartState();		 
 
-	     }
-
+	     } 
 	 
 	 }
 	 
@@ -1776,8 +1794,8 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 							randomIndex = Utils.getRandomNumberFromRange(start, numOptions - base);					
 							break;
 						case Constants.SKILL_LEVEL_PROFESSIONAL:
-							//first 75% unless losing by 100
-							base = Math.round(numOptions / 4); 
+							//first 80% unless losing by 100
+							base = Math.round(numOptions / 5); 
 							start = 0;
 							
 							//if opponent is losing by 100 or more, play from the top 5% 
@@ -1794,7 +1812,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 						case Constants.SKILL_LEVEL_EXPERT:
 							//top 20% (or top 10%) unless losing by 80
 							
-							base = Math.round(numOptions / 6); 
+							base = Math.round(numOptions / 10); 
 							start = Math.round(numOptions / 10);	
 							if (Utils.coinFlip() == Constants.COIN_FLIP_HEADS){
 								base = Math.round(numOptions / 10); 
@@ -1894,11 +1912,12 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		    	GameSurface.this.opponentListadapter.notifyDataSetChanged();
 		    	GameSurface.this.lvOpponent.setSelection(GameSurface.this.opponentListadapter.getCount() - 1);
 		    	GameSurface.this.game.getPlayedWords().add(playedWord[0]);
+		    	GameSurface.this.game.incrementNumWordsPlayedThisRound();
 		    	GameSurface.this.game.setOpponentScore(GameSurface.this.game.getOpponentScore() + playedWord[0].getPointsScored());
 				
 		    	GameSurface.this.tvOpponentScore.setText(String.valueOf(GameSurface.this.game.getOpponentScore()));
 			 	
-		    	GameSurface.this.tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - GameSurface.this.game.getPlayedWords().size()));
+		    	GameSurface.this.tvWordsLeft.setText(String.format(GameSurface.this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), GameSurface.this.game.getNumPossibleWords() - GameSurface.this.game.getNumWordsPlayedThisRound()));
 
 		    	
 		    }
@@ -2185,7 +2204,7 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		//this.playerListadapter.add(playedWord);
 	 // context.adapter.updateList(context.workingList); 
 		// this.playerListadapter.
-		/* runOnUiThread(new Runnable() {
+		/* runOnUiThread(new ha() {
 		        public void run() {
 		            // use data here
 		        //	unloadPlaySpinner();
@@ -2200,8 +2219,9 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		this.game.setPlayerScore(this.game.getPlayerScore() + points);
 		
 		this.tvPlayerScore.setText(String.valueOf(this.game.getPlayerScore()));
+		this.game.incrementNumWordsPlayedThisRound();
 	 	
-		this.tvWordsLeft.setText(String.format(this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - game.getPlayedWords().size()));
+		this.tvWordsLeft.setText(String.format(this.getString(com.riotapps.wordrace.R.string.scoreboard_words_left), game.getNumPossibleWords() - game.getNumWordsPlayedThisRound()));
  
 		//save game upon completion, not here
 	}
@@ -2754,20 +2774,29 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	   private void setCountdown(long startingPointInMilliseconds){
 		   Logger.d(TAG, "setCountdown startingPointInMilliseconds=" + startingPointInMilliseconds);
 		   
-		   this.countdown = new CountDownTimer(startingPointInMilliseconds, 1000) {
+		   this.countdown = new CountDownTimer(startingPointInMilliseconds, 10) {
 
+			   
 		     public void onTick(long millisUntilFinished) {
-		    	 int secondsUntilFinished = (int) millisUntilFinished / 1000;
-		    	 int minutesLeft = (int) secondsUntilFinished / 60;
-		    	 int secondsLeft = secondsUntilFinished - (minutesLeft * 60);
-		    
-		    	 GameSurface.this.game.setCountdown(millisUntilFinished);
-		    	 
-		    	 if (minutesLeft == 0 && secondsLeft < 11){
-		    		 GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_finish_text_color)));
+		    	 if (millisUntilFinished%10 == 0) {
+			    	 int secondsUntilFinished = (int) millisUntilFinished / 1000;
+			    	 int minutesLeft = (int) secondsUntilFinished / 60;
+			    	 int secondsLeft = secondsUntilFinished - (minutesLeft * 60);
+			    
+			    	 GameSurface.this.game.setCountdown(millisUntilFinished);
+			    	 
+			    	 if (minutesLeft == 0 && secondsLeft < 11){
+			    		 GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_finish_text_color)));
+			    	 }
+			    	
+			    	 GameSurface.this.tvCountdown.setText(String.format(GameSurface.this.getString(R.string.scoreboard_countdown), minutesLeft, String.format("%02d", secondsLeft)));
+			    	 
+		    	 }
+		    	 else if(millisUntilFinished == 10){
+		    		 GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
+		    		 GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_text_color)));
 		    	 }
 		    	 
-		         GameSurface.this.tvCountdown.setText(String.format(GameSurface.this.getString(R.string.scoreboard_countdown), minutesLeft, String.format("%02d", secondsLeft)));
 		     }
 
 		     
@@ -2779,8 +2808,9 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		    	  GameSurface.this.game.setCountdown(0);
 				   
 		        // mTextField.setText("done!");
-		    	 GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
-	    		 GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_text_color)));
+		    	 //GameSurface.this.restartCountdownView();
+		    	 //GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
+	    		 //GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_text_color)));
 		    	 
 		    	 if (GameSurface.this.game.isSpeedRoundType()){
 		    		GameSurface.this.handleRound(GameSurface.this.game.getRound() + 1); 
@@ -2804,7 +2834,41 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		  this.autoPlay();
 	   }
 	   
+	   private void restartCountdownView(){
+		   Logger.d(TAG, "restartCountdownView");
+		   this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_completed));
+  		 	this.tvCountdown.setTextColor(Color.parseColor(this.getString(R.color.countdown_text_color)));
+	   }
+	   
+		 private class handleCountdownViewState implements Runnable {
+			 private int round; //1 = shuffle, 2 = recall 	
+			 
+			 public handleCountdownViewState(int round){
+			 		this.round = round;
+			 	}
+			 
+			    public void run() {
+			    	if (this.round == 2 || this.round == 3){
+			    		   GameSurface.this.tvCountdown.setText(GameSurface.this.getString(R.string.scoreboard_countdown_completed));
+			    		   GameSurface.this.tvCountdown.setTextColor(Color.parseColor(GameSurface.this.getString(R.color.countdown_text_color)));
+			    	}
+			    	else {
+						 Button bRematch = (Button) GameSurface.this.findViewById(R.id.bRematch);
+						 bRematch.setVisibility(View.VISIBLE);
+						 bRematch.setText(String.format(GameSurface.this.getString(R.string.game_surface_rematch), GameSurface.this.game.getOpponent().getName()));
+						 bRematch.setClickable(true);
+						 bRematch.setOnClickListener(GameSurface.this);
+						 GameSurface.this.tvCountdown.setVisibility(View.GONE);
+
+			    	}
+			    }
+		  }
+	   
 	   private void handleCompletion(){
+
+		   //this.restartCountdownView();
+		  // Logger.d(TAG, "handleCompletion this.tvCountdown=" + this.tvCountdown.getText());
+
 		   this.isCompletedThisSession = true;
 		   GameService.completeGame(this, this.player, this.game);
 		   this.setCompletedState();
@@ -2833,8 +2897,10 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 		   //update possible words
 		   //update UI
 		   //update game round
+		   
+		   
 		   if (round == 3 || round == 2) {
-			   
+			   //this.restartCountdownView();   
 			   this.currentWord.clear();
 			   this.game.setRound(round);
 			   if (this.autoPlayTask != null){
@@ -2852,11 +2918,13 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 			   this.possibleWords.clear();
 			   this.opponentWords.clear();
 			   
+				this.tvCountdown.setText(this.getString(R.string.scoreboard_countdown_speed_round_start));
+				this.tvCountdown.setTextColor(Color.parseColor(this.getString(R.color.countdown_text_color)));
 			   String message = this.getString(R.string.progress_setting_up_round_2);
 			   if (round == 3){
 				   message = this.getString(R.string.progress_setting_up_round_3);
 			   }
-			   
+			   this.game.setNumWordsPlayedThisRound(0);
 			   
 			   this.setupPreloadTask(message);
 		   }
