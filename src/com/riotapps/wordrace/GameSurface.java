@@ -806,14 +806,14 @@ public class GameSurface  extends FragmentActivity implements View.OnClickListen
 	 
 	    	if (StoreService.isHideBannerAdsPurchased(this)){	
 				adView.setVisibility(View.GONE);
-				vBottomFill.setVisibility(View.VISIBLE);
+				vBottomFill.setVisibility(View.VISIBLE);  
 			}
 	    	else {
 	    		NetworkConnectivity connection = new NetworkConnectivity(this);
 	    		boolean isConnected = connection.checkNetworkConnectivity();
 	    		
 	    		if (isConnected){
-	    			vBottomFill.setVisibility(View.GONE);
+	    			vBottomFill.setVisibility(View.GONE); 
 	    			adView.loadAd(new AdRequest());
 	    			
 	    		}
